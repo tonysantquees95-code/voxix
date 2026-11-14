@@ -6,6 +6,7 @@ export interface Novidade { id: number; data: string; tipo: TipoNovidade; titulo
 
 export const NOVIDADES: Novidade[] = [
   { id: 1, data: "2026-11-14", tipo: "novo", titulo: "Voxix chegou", texto: "Conversas privadas ao vivo com o apelido dos seus amigos, bloqueio, denúncia e ditado por microfone." },
+  { id: 2, data: "2026-11-14", tipo: "correcao", titulo: "Tela entre as barras do Android", texto: "No Android, o Voxix agora fica entre a barra de cima e os botões de navegação, sem passar por baixo deles, mesmo quando as barras estão fixas. Os botões de baixo e o campo de mensagem não ficam mais escondidos." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

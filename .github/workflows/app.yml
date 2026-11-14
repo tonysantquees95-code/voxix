@@ -95,6 +95,8 @@ jobs:
           # ditado por voz do aparelho: microfone + visibilidade do serviço de reconhecimento de fala (Android 11+)
           sed -i "s#<application#<uses-permission android:name=\"android.permission.RECORD_AUDIO\" />\n    <queries>\n        <intent>\n            <action android:name=\"android.speech.RecognitionService\" />\n        </intent>\n    </queries>\n    <application#" android/app/src/main/AndroidManifest.xml
           grep -c "RECORD_AUDIO" android/app/src/main/AndroidManifest.xml
+          # a tela fica entre as barras do Android (status e navegação), em qualquer configuração do aparelho
+          cp native/MainActivity.java android/app/src/main/java/tech/vetorial/voxix/MainActivity.java
           npx capacitor-assets generate --android --iconBackgroundColor '#05070D' --iconBackgroundColorDark '#05070D' --splashBackgroundColor '#05070D' --splashBackgroundColorDark '#05070D'
           npx cap sync android
         env:

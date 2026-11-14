@@ -1,0 +1,11 @@
+[package]
+name = "voxix-desktop"
+version = "1.0.0"
+edition = "2021"
+description = "Voxix para Windows (Tauri)"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }

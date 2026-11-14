@@ -3,12 +3,16 @@ import { api, type Pessoa } from "../api";
 import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
+import { NOVIDADES } from "../novidades";
+import { Novidades } from "./Novidades";
+import { Termos, Tour } from "./Apresentacao";
 
 export function Ajustes({ fechar }: { fechar: () => void }) {
   const { sessao, perfil, sair } = useVoxix();
   const [bloqueados, setBloqueados] = useState<Pessoa[] | null>(null);
   const [versao, setVersao] = useState("");
   const [novaVersao, setNovaVersao] = useState(false);
+  const [ver, setVer] = useState<"tour" | "termos" | "novidades" | null>(null);
 
   useEffect(() => { if (sessao) void api.bloqueios(sessao.token).then((r) => setBloqueados(r.bloqueios)).catch(() => setBloqueados([])); }, [sessao]);
 
@@ -47,9 +51,20 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
           </div>
           {versao && <p className="mt-1 text-xs text-suave" role="status">{versao}</p>}
         </section>
+        <section>
+          <h3 className="text-sm font-bold text-suave">Sobre o Voxix</h3>
+          <div className="mt-2 flex flex-col gap-2 text-sm">
+            <button onClick={() => setVer("tour")} className="rounded-xl border border-borda px-4 py-2 text-left">Como o Voxix funciona</button>
+            <button onClick={() => setVer("novidades")} className="rounded-xl border border-borda px-4 py-2 text-left">O que há de novo</button>
+            <button onClick={() => setVer("termos")} className="rounded-xl border border-borda px-4 py-2 text-left">Termos de uso</button>
+          </div>
+        </section>
         <p className="text-xs text-suave">As conversas ficam só neste aparelho. Se você sair da conta, o histórico continua guardado aqui.</p>
         <button onClick={() => void sair()} className="w-full rounded-xl border border-erro py-2.5 font-bold text-erro">Sair da conta</button>
       </div>
+      {ver === "tour" && <div className="fixed inset-0 z-50 flex flex-col bg-fundo p-5" onClick={(e) => e.stopPropagation()}><div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"><Tour rotuloFinal="Fechar" aoTerminar={() => setVer(null)} aoFechar={() => setVer(null)} /></div></div>}
+      {ver === "termos" && <Termos aoFechar={() => setVer(null)} />}
+      {ver === "novidades" && <Novidades itens={[...NOVIDADES].sort((a, b) => b.id - a.id)} aoFechar={() => setVer(null)} />}
     </div>
   );
 }

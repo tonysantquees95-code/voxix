@@ -9,6 +9,21 @@ export interface Ganchos { aoTexto: (texto: string) => void; aoFim: () => void; 
 
 export const LIMITE_GRAVACAO_MS = 30_000;
 
+/** Pede o microfone antes de usar o ditado (na apresentação). Devolve se foi liberado. */
+export async function pedirMicrofone(): Promise<boolean> {
+  try {
+    if (Capacitor.isNativePlatform()) {
+      const { SpeechRecognition } = await import("@capacitor-community/speech-recognition");
+      return (await SpeechRecognition.requestPermissions()).speechRecognition === "granted";
+    }
+    const f = await navigator.mediaDevices.getUserMedia({ audio: true });
+    for (const t of f.getTracks()) t.stop();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function iniciarDitado(g: Ganchos, token: string): Promise<Ditado> {
   return Capacitor.isNativePlatform() ? ditadoNativo(g) : ditadoPeloServidor(g, token);
 }

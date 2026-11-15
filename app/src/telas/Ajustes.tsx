@@ -3,6 +3,9 @@ import { api, type Pessoa } from "../api";
 import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
+import { LogoTempestade } from "../logo";
+import { FORCAS, TEMAS, mudarVisual } from "../personalizar";
+import { useVisual } from "../useVisual";
 import { NOVIDADES } from "../novidades";
 import { Novidades } from "./Novidades";
 import { Termos, Tour } from "./Apresentacao";
@@ -13,6 +16,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   const [versao, setVersao] = useState("");
   const [novaVersao, setNovaVersao] = useState(false);
   const [ver, setVer] = useState<"tour" | "termos" | "novidades" | null>(null);
+  const visual = useVisual();
 
   useEffect(() => { if (sessao) void api.bloqueios(sessao.token).then((r) => setBloqueados(r.bloqueios)).catch(() => setBloqueados([])); }, [sessao]);
 
@@ -36,6 +40,24 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
       <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-full w-full max-w-sm space-y-4 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
         <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">Ajustes</h2><button onClick={fechar} aria-label="Fechar" className="text-xl text-suave">✕</button></div>
         <section><h3 className="text-sm font-bold text-suave">Conta</h3><p className="mt-1">@{perfil?.apelido} · {perfil?.nome}</p><p className="text-xs text-suave">{sessao?.email}</p></section>
+        <section>
+          <h3 className="text-sm font-bold text-suave">Personalizar</h3>
+          <div className="mt-2 flex justify-center py-3"><LogoTempestade tam={72} /></div>
+          <p className="text-xs text-suave">Cor do aplicativo</p>
+          <div className="mt-1 flex flex-wrap gap-2" role="radiogroup" aria-label="Cor do aplicativo">
+            {TEMAS.map((t) => (
+              <button key={t.id} role="radio" aria-checked={visual.tema === t.id} onClick={() => mudarVisual({ tema: t.id })} className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm ${visual.tema === t.id ? "border-neon" : "border-borda"}`}>
+                <span className="h-4 w-4 rounded-full" style={{ background: `linear-gradient(135deg, ${t.neon}, ${t.magenta})` }} />{t.nome}
+              </button>
+            ))}
+          </div>
+          <label className="mt-3 flex items-center justify-between gap-3 text-sm"><span>Tempestade atrás do logo<span className="block text-xs text-suave">Luz neon que pisca forte e fraca, como trovões.</span></span><input type="checkbox" checked={visual.tempestade} onChange={(e) => mudarVisual({ tempestade: e.target.checked })} className="h-5 w-5 accent-neon" /></label>
+          {visual.tempestade && (
+            <div className="mt-2 flex gap-2" role="radiogroup" aria-label="Força da tempestade">
+              {FORCAS.map((f) => <button key={f.id} role="radio" aria-checked={visual.forca === f.id} onClick={() => mudarVisual({ forca: f.id })} className={`flex-1 rounded-xl border px-3 py-1.5 text-sm ${visual.forca === f.id ? "border-neon" : "border-borda"}`}>{f.nome}</button>)}
+            </div>
+          )}
+        </section>
         <section>
           <h3 className="text-sm font-bold text-suave">Bloqueados</h3>
           {bloqueados === null ? <p className="mt-1 text-sm text-suave">Carregando…</p> : bloqueados.length === 0 ? <p className="mt-1 text-sm text-suave">Ninguém bloqueado.</p> : bloqueados.map((p) => (

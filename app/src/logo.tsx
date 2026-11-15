@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { useVisual } from "./useVisual";
 
 /** Desenho oficial do Voxix: V com X no meio, em roxo escuro com contorno vermelho brilhante (igual ao conceito visual). */
 function Defs({ id }: { id: string }) {
@@ -51,9 +52,24 @@ export function NomeVoxix({ largura = 200, className = "" }: { largura?: number;
 export function Marca({ tam = 120 }: { tam?: number }) {
   return (
     <div className="flex flex-col items-center gap-3">
-      <Logo tam={tam} />
+      <LogoTempestade tam={tam} />
       <NomeVoxix largura={tam * 1.9} />
       <div className="text-xs font-black tracking-[0.45em] text-white">GAMING CHAT</div>
     </div>
+  );
+}
+
+/** O V com X com a tempestade atrás: luz neon que alterna entre forte e fraca, como trovões (desliga em Ajustes › Personalizar). */
+export function LogoTempestade({ tam = 120, className = "" }: { tam?: number; className?: string }) {
+  const v = useVisual();
+  if (!v.tempestade) return <Logo tam={tam} className={className} />;
+  return (
+    <span className={`tempestade ${className}`} data-forca={v.forca} style={{ width: tam, height: (tam * 120) / 130 }}>
+      <svg className="raios" viewBox="0 0 100 100" aria-hidden="true">
+        <polyline points="30,0 17,24 32,28 8,58 24,62 4,96" />
+        <polyline points="76,2 90,26 74,31 96,60 80,64 94,98" />
+      </svg>
+      <Logo tam={tam} />
+    </span>
   );
 }

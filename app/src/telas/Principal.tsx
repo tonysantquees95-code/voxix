@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { lista, totalNaoLidas } from "../armazem";
 import { BUILD, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
-import { Logo } from "../logo";
+import { Logo, LogoTempestade } from "../logo";
 import { Ajustes } from "./Ajustes";
 import { Conversa } from "./Conversa";
 import { NovaConversa } from "./NovaConversa";
@@ -49,7 +49,7 @@ export function Principal() {
         </div>
       </aside>
       <main className={`${aberta ? "flex" : "hidden md:flex"} min-h-0 flex-col`}>
-        {aberta ? <Conversa apelido={aberta} /> : <div className="m-auto text-center text-suave"><Logo tam={72} className="mx-auto mb-3 opacity-60" /><p>Escolha uma conversa</p></div>}
+        {aberta ? <Conversa apelido={aberta} /> : <div className="m-auto text-center text-suave"><LogoTempestade tam={72} className="mx-auto mb-3" /><p>Escolha uma conversa</p></div>}
       </main>
       {painel === "nova" && <NovaConversa fechar={() => setPainel(null)} />}
       {painel === "ajustes" && <Ajustes fechar={() => setPainel(null)} />}

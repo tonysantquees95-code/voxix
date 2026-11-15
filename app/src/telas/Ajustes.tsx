@@ -3,7 +3,7 @@ import { api, type Pessoa } from "../api";
 import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
-import { LogoTempestade } from "../logo";
+import { Logo } from "../logo";
 import { Icone } from "../icones";
 import { Personalizar } from "./Personalizar";
 import { NOVIDADES } from "../novidades";
@@ -48,7 +48,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
         <section>
           <h3 className="text-sm font-bold text-suave">Personalizar</h3>
           <button onClick={() => setPersonalizando(true)} className="mt-2 flex w-full items-center gap-3 rounded-xl border border-borda px-4 py-3 text-left">
-            <LogoTempestade tam={40} />
+            <Logo tam={40} />
             <span className="min-w-0 flex-1"><b className="block">Cores, formato, fundo e teclado</b><span className="block text-xs text-suave">Cor com RGB, formato dos ícones, papel de parede, emojis e o teclado do Voxix.</span></span>
             <span className="text-suave"><Icone nome="seta" tam={18} /></span>
           </button>

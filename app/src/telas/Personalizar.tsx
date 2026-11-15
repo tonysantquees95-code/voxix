@@ -1,10 +1,10 @@
 import { useRef, useState, type ReactNode } from "react";
 import { PACOTES } from "../emojis";
 import { Icone, type NomeIcone } from "../icones";
-import { LogoTempestade } from "../logo";
+import { Logo } from "../logo";
 import { PapelDeParede, fotoDo, guardarFoto, reduzirImagem, useFoto, type Qual } from "../papel";
 import {
-  FORCAS, FORMATOS, MODELOS_PAPEL, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
+  FORMATOS, MODELOS_PAPEL, MODOS_LUZ, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarLuz, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
   type CorLed, type EfeitoToque, type FormaTecla, type Formato, type ModeloPapel,
 } from "../personalizar";
 import { Teclado } from "../Teclado";
@@ -81,13 +81,17 @@ function AbaCores() {
         <SeletorRgb valor={personalizada ? v.cor : c.neon} aoMudar={(h) => mudarVisual({ cor: h })} />
         <p className="mt-1 text-xs text-suave">A segunda cor (do emblema e das mensagens) é calculada a partir da sua.</p>
       </div>
-      <div className="space-y-2">
-        <Interruptor ligado={v.tempestade} aoMudar={(x) => mudarVisual({ tempestade: x })} titulo="Tempestade atrás do logo" dica="Luz neon na cor escolhida que pisca forte e fraca, como trovões." />
-        {v.tempestade && (
-          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Força da tempestade">
-            {FORCAS.map((f) => <Chip key={f.id} cheio ativo={v.forca === f.id} onClick={() => mudarVisual({ forca: f.id })}>{f.nome}</Chip>)}
-          </div>
-        )}
+      <div>
+        <p className="mb-1 text-xs text-suave">Luz em volta do logo</p>
+        <div className="grid gap-2" role="radiogroup" aria-label="Luz em volta do logo">
+          {MODOS_LUZ.map((m) => (
+            <button key={m.id} type="button" role="radio" aria-checked={v.luz.modo === m.id} onClick={() => mudarLuz({ modo: m.id })}
+              className={`rounded-xl border p-3 text-left text-sm ${v.luz.modo === m.id ? "border-neon bg-neon/10" : "border-borda"}`}>
+              <b className="block">{m.nome}</b><span className="block text-xs text-suave">{m.dica}</span>
+            </button>
+          ))}
+        </div>
+        {v.luz.modo === "cor" && <div className="mt-2"><SeletorRgb valor={v.luz.cor} aoMudar={(h) => mudarLuz({ cor: h })} /></div>}
       </div>
     </div>
   );
@@ -292,7 +296,7 @@ export function Personalizar({ fechar, irParaInicio }: { fechar: () => void; irP
         <h2 className="min-w-0 flex-1 truncate text-center text-lg font-extrabold">Personalizar</h2>
         <button onClick={irParaInicio} aria-label="Ir para o início" className="rounded-xl bg-neon px-3 py-2 text-sm font-bold text-white"><span className="inline-flex items-center gap-1.5"><Icone nome="inicio" tam={16} /> Início</span></button>
       </header>
-      <div className="flex flex-none justify-center bg-painel/60 py-3"><LogoTempestade tam={56} /></div>
+      <div className="flex flex-none justify-center bg-painel/60 py-3"><Logo tam={56} /></div>
       <nav className="grid flex-none grid-cols-6 gap-1 border-b border-borda bg-painel px-2 pb-2" role="tablist" aria-label="Seções">
         {ABAS.map((a) => (
           <button key={a.id} type="button" role="tab" aria-selected={aba === a.id} onClick={() => setAba(a.id)}

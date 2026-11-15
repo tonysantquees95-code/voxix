@@ -19,17 +19,12 @@ button { cursor: pointer; }
 @keyframes pulsa { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(1.12); } }
 .gravando { animation: pulsa 1s ease-in-out infinite; }
 
-/* Tempestade atrás do logo: duas luzes (cor do tema) que alternam entre forte e fraca em tempos diferentes. */
-.tempestade { position: relative; display: inline-grid; place-items: center; --alcance: -38%; }
-.tempestade[data-forca="fraca"] { --alcance: -24%; }
-.tempestade[data-forca="forte"] { --alcance: -55%; }
-.tempestade::before, .tempestade::after { content: ""; position: absolute; inset: var(--alcance); border-radius: 50%; pointer-events: none; z-index: 0; }
-.tempestade::before { background: radial-gradient(closest-side, color-mix(in srgb, var(--color-neon) 90%, transparent), transparent 72%); filter: blur(10px); animation: trovao-a 6.1s linear infinite; }
-.tempestade::after { background: radial-gradient(closest-side, color-mix(in srgb, var(--color-magenta) 85%, transparent), transparent 74%); filter: blur(16px); animation: trovao-b 8.3s linear infinite; }
-.tempestade > svg { position: relative; z-index: 2; }
-@keyframes trovao-a { 0%, 100% { opacity: .22; } 5% { opacity: 1; } 7% { opacity: .3; } 10% { opacity: .9; } 13% { opacity: .25; } 48% { opacity: .3; } 50% { opacity: .85; } 52% { opacity: .28; } 53% { opacity: 1; } 58% { opacity: .22; } 85% { opacity: .35; } 87% { opacity: .7; } 90% { opacity: .22; } }
-@keyframes trovao-b { 0%, 100% { opacity: .3; } 22% { opacity: .25; } 24% { opacity: 1; } 26% { opacity: .35; } 29% { opacity: .8; } 34% { opacity: .28; } 61% { opacity: .3; } 63% { opacity: .95; } 66% { opacity: .3; } 92% { opacity: .75; } 95% { opacity: .3; } }
-@media (prefers-reduced-motion: reduce) { .tempestade::before, .tempestade::after { animation: none; } .tempestade::before { opacity: .6; } .tempestade::after { opacity: .5; } }
+/* Luz que corre em volta do contorno do logo (o RGB muda de cor enquanto corre). */
+@keyframes luz-corre { to { stroke-dashoffset: -100; } }
+@keyframes luz-matiz { 0%, 100% { stroke: #ff2a2a; } 33% { stroke: #2aff5a; } 66% { stroke: #2a6bff; } }
+.luz-faixa { animation: luz-corre 4.2s linear infinite; }
+.luz-faixa.luz-rgb { animation: luz-corre 4.2s linear infinite, luz-matiz 5s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .luz-faixa, .luz-faixa.luz-rgb { animation: none; } }
 
 /* ---- formato dos ícones, avatares, balões e botões (Ajustes › Personalizar › Formato) ---- */
 :root { --r-balao: 1.1rem; --r-avatar: 9999px; --r-botao: 9999px; --r-tecla: .8rem; }

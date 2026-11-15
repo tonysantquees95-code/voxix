@@ -3,7 +3,7 @@ import { lista, totalNaoLidas } from "../armazem";
 import { BUILD, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { Icone } from "../icones";
-import { Logo, LogoTempestade } from "../logo";
+import { Logo } from "../logo";
 import { PapelDeParede } from "../papel";
 import { Ajustes } from "./Ajustes";
 import { Conversa } from "./Conversa";
@@ -53,7 +53,7 @@ export function Principal() {
       </aside>
       <main className={`${aberta ? "flex" : "hidden md:flex"} relative min-h-0 flex-col`}>
         {!aberta && <PapelDeParede qual="inicio" />}
-        {aberta ? <Conversa apelido={aberta} /> : <div className="relative z-[1] m-auto text-center text-suave"><LogoTempestade tam={72} className="mx-auto mb-3" /><p>Escolha uma conversa</p></div>}
+        {aberta ? <Conversa apelido={aberta} /> : <div className="relative z-[1] m-auto text-center text-suave"><Logo tam={72} className="mx-auto mb-3" /><p>Escolha uma conversa</p></div>}
       </main>
       {painel === "nova" && <NovaConversa fechar={() => setPainel(null)} />}
       {painel === "ajustes" && <Ajustes fechar={() => setPainel(null)} />}

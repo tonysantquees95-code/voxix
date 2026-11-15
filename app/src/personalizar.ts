@@ -1,4 +1,4 @@
-// Personalização do Voxix: cor (pronta ou RGB), formato dos ícones, papel de parede, teclado e a "tempestade" (luz neon que pisca atrás do logo).
+// Personalização do Voxix: cor (pronta ou RGB), formato dos ícones, papel de parede, teclado e a luz que corre em volta do logo.
 // Este módulo é puro (sem React): dá para testar com node.
 export interface Tema { id: string; nome: string; neon: string; magenta: string }
 export const TEMAS: Tema[] = [
@@ -11,8 +11,15 @@ export const TEMAS: Tema[] = [
   { id: "laranja", nome: "Laranja", neon: "#f97316", magenta: "#dc2626" },
   { id: "dourado", nome: "Dourado", neon: "#eab308", magenta: "#ea580c" },
 ];
-export type Forca = "fraca" | "media" | "forte";
-export const FORCAS: { id: Forca; nome: string }[] = [{ id: "fraca", nome: "Suave" }, { id: "media", nome: "Média" }, { id: "forte", nome: "Forte" }];
+/** Luz que corre em volta do contorno do logo: branca, RGB (muda de cor sem parar) ou uma cor escolhida. */
+export type ModoLuz = "rgb" | "branca" | "cor";
+export const MODOS_LUZ: { id: ModoLuz; nome: string; dica: string }[] = [
+  { id: "rgb", nome: "RGB colorido", dica: "Vermelho, verde e azul correndo e mudando de cor." },
+  { id: "branca", nome: "Branca", dica: "Faixas brancas, como no Velox." },
+  { id: "cor", nome: "Minha cor", dica: "Faixas na cor que você escolher." },
+];
+export interface Luz { modo: ModoLuz; cor: string }
+export const LUZ_PADRAO: Luz = { modo: "rgb", cor: "#3dff8a" };
 
 /** Formato dos ícones, avatares, balões e botões do app inteiro. */
 export type Formato = "redondo" | "quadrado" | "futurista";
@@ -69,8 +76,7 @@ export function limparIcones(v: unknown): Icones {
 
 export interface Visual {
   cor: string;              // id de um tema pronto ou "#rrggbb" escolhido no RGB
-  tempestade: boolean;
-  forca: Forca;
+  luz: Luz;
   formato: Formato;
   papelInicio: Papel;
   papelConversa: Papel;
@@ -79,7 +85,7 @@ export interface Visual {
   pacoteEmoji: string;      // pacote aberto por último no teclado
 }
 export const VISUAL_PADRAO: Visual = {
-  cor: "voxix", tempestade: true, forca: "media", formato: "redondo",
+  cor: "voxix", luz: LUZ_PADRAO, formato: "redondo",
   papelInicio: PAPEL_PADRAO, papelConversa: PAPEL_PADRAO, teclado: TECLADO_PADRAO, icones: ICONES_PADRAO, pacoteEmoji: "recentes",
 };
 
@@ -91,6 +97,10 @@ const limite = (v: unknown, min: number, max: number, padrao: number): number =>
 };
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
 
+export function limparLuz(v: unknown): Luz {
+  const o = obj(v);
+  return { modo: um(MODOS_LUZ.map((m) => m.id), o.modo, LUZ_PADRAO.modo), cor: hexValido(o.cor) ? o.cor.toLowerCase() : LUZ_PADRAO.cor };
+}
 export function limparPapel(v: unknown): Papel {
   const o = obj(v);
   return { modelo: um(MODELOS_PAPEL.map((m) => m.id), o.modelo, PAPEL_PADRAO.modelo), escurecer: limite(o.escurecer, 0, 85, PAPEL_PADRAO.escurecer) };
@@ -116,8 +126,7 @@ export function limparVisual(v: unknown): Visual {
   const cor = typeof bruta === "string" && (TEMAS.some((t) => t.id === bruta) || hexValido(bruta)) ? bruta : VISUAL_PADRAO.cor;
   return {
     cor,
-    tempestade: typeof o.tempestade === "boolean" ? o.tempestade : VISUAL_PADRAO.tempestade,
-    forca: um(FORCAS.map((f) => f.id), o.forca, VISUAL_PADRAO.forca),
+    luz: limparLuz(o.luz),
     formato: um(FORMATOS.map((f) => f.id), o.formato, VISUAL_PADRAO.formato),
     papelInicio: limparPapel(o.papelInicio),
     papelConversa: limparPapel(o.papelConversa),
@@ -187,5 +196,6 @@ export function mudarVisual(parcial: Partial<Visual>) {
 export const mudarTeclado = (p: Partial<Teclado>) => mudarVisual({ teclado: { ...atual.teclado, ...p } });
 export const mudarPapel = (qual: "papelInicio" | "papelConversa", p: Partial<Papel>) =>
   mudarVisual(qual === "papelInicio" ? { papelInicio: { ...atual.papelInicio, ...p } } : { papelConversa: { ...atual.papelConversa, ...p } });
+export const mudarLuz = (p: Partial<Luz>) => mudarVisual({ luz: { ...atual.luz, ...p } });
 export const mudarIcones = (p: Partial<Icones>) => mudarVisual({ icones: { ...atual.icones, ...p } });
 export function restaurarVisual() { mudarVisual({ ...VISUAL_PADRAO }); }

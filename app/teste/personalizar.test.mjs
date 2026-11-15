@@ -1,12 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ICONES_PADRAO, limparIcones, TRACOS, ESCALAS_ICONE, coresDe, girarMatiz, hexDe, hexValido, limparVisual, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
+import { ICONES_PADRAO, limparIcones, TRACOS, ESCALAS_ICONE, coresDe, girarMatiz, hexDe, hexValido, limparVisual, limparLuz, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
 
 test("limparVisual: lixo volta ao padrão e valores válidos passam", () => {
   assert.deepEqual(limparVisual(null), VISUAL_PADRAO);
-  assert.deepEqual(limparVisual({ cor: "x", tempestade: "sim", forca: 9, formato: "oval", papelInicio: 5, teclado: "x" }), VISUAL_PADRAO);
-  const v = limparVisual({ cor: "azul", tempestade: false, forca: "forte", formato: "quadrado", papelConversa: { modelo: "grade", escurecer: 50 }, teclado: { forma: "futurista", efeito: "brilho" } });
-  assert.equal(v.cor, "azul"); assert.equal(v.tempestade, false); assert.equal(v.forca, "forte"); assert.equal(v.formato, "quadrado");
+  assert.deepEqual(limparVisual({ cor: "x", luz: 5, formato: "oval", papelInicio: 5, teclado: "x" }), VISUAL_PADRAO);
+  const v = limparVisual({ cor: "azul", luz: { modo: "branca", cor: "#112233" }, formato: "quadrado", papelConversa: { modelo: "grade", escurecer: 50 }, teclado: { forma: "futurista", efeito: "brilho" } });
+  assert.equal(v.cor, "azul"); assert.deepEqual(v.luz, { modo: "branca", cor: "#112233" }); assert.equal(v.formato, "quadrado");
   assert.deepEqual(v.papelConversa, { modelo: "grade", escurecer: 50 });
   assert.equal(v.teclado.forma, "futurista"); assert.equal(v.teclado.efeito, "brilho"); assert.equal(v.teclado.usar, true);
 });
@@ -60,4 +60,11 @@ test("ícones: espessura, tamanho, estilo e cor só aceitam valores conhecidos",
   assert.deepEqual(limparVisual({}).icones, ICONES_PADRAO);
   assert.ok(TRACOS.fino < TRACOS.medio && TRACOS.medio < TRACOS.grosso);
   assert.ok(ESCALAS_ICONE.pequeno < ESCALAS_ICONE.medio && ESCALAS_ICONE.medio < ESCALAS_ICONE.grande);
+});
+
+test("luz do logo: padrão RGB, aceita só modos e cores válidos", () => {
+  assert.equal(VISUAL_PADRAO.luz.modo, "rgb");
+  assert.deepEqual(limparLuz({ modo: "arco-iris", cor: "verde" }), VISUAL_PADRAO.luz);
+  assert.deepEqual(limparLuz({ modo: "cor", cor: "#FF8800" }), { modo: "cor", cor: "#ff8800" });
+  assert.deepEqual(limparLuz(null), VISUAL_PADRAO.luz);
 });

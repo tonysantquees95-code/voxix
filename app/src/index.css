@@ -26,6 +26,9 @@ button { cursor: pointer; }
 .luz-faixa.luz-rgb { animation: luz-corre 4.2s linear infinite, luz-matiz 5s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .luz-faixa, .luz-faixa.luz-rgb { animation: none; } }
 
+/* Ícone sobre fundo na cor do app fica sempre branco (senão, com "ícones na cor do app", sumia no botão). */
+.bg-neon svg, .tecla-enviar svg, .balao-meu svg { color: #fff !important; }
+
 /* ---- formato dos ícones, avatares, balões e botões (Ajustes › Personalizar › Formato) ---- */
 :root { --r-balao: 1.1rem; --r-avatar: 9999px; --r-botao: 9999px; --r-tecla: .8rem; }
 :root { --corte-avatar: none; --corte-balao: none; --corte-tecla: none; }

@@ -16,6 +16,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 9, data: "2026-11-14", tipo: "melhoria", titulo: "Personalizar em tela cheia", texto: "A tela de Personalizar agora ocupa a tela toda e não muda de tamanho quando você troca de seção. Tem um botão Voltar e outro Início, as opções ficaram alinhadas e a prévia dos formatos mostra cada um do jeito certo." },
   { id: 10, data: "2026-11-14", tipo: "novo", titulo: "Ícones do seu jeito", texto: "Os ícones do app (engrenagem, enviar, microfone, teclado e outros) ganharam desenho próprio. Em Personalizar › Ícones você escolhe a espessura do traço (fino, médio ou grosso), o tamanho, se ficam só com contorno ou com preenchimento, e se seguem a cor do app. O Formato continua mudando só a forma dos avatares, balões e botões redondos." },
   { id: 11, data: "2026-11-14", tipo: "novo", titulo: "Logo novo com luz correndo", texto: "O logo do Voxix ficou mais fino: um V inteiriço com o X por cima, sem o fundo de trovão. Uma luz corre em volta do contorno, no logo de cima e no ícone do app. Em Personalizar › Cores você escolhe a luz: RGB colorido (muda de cor sem parar), branca ou a cor que quiser." },
+  { id: 12, data: "2026-11-15", tipo: "correcao", titulo: "Ícone do botão + visível", texto: "Com os ícones na cor do app, o botão de nova conversa (+) ficava todo vermelho, sem o sinal. Agora os ícones sobre botões coloridos ficam sempre brancos e aparecem em qualquer cor escolhida." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

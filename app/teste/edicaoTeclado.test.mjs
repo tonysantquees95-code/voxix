@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ACENTOS, LETRAS, NUMEROS, apagar, comecaFrase, inserir } from "../src/teclado.ts";
+import { ACENTOS, LETRAS, NUMEROS, apagar, comecaFrase, inserir } from "../src/edicaoTeclado.ts";
 import { MAX_RECENTES, PACOTES, somarRecente } from "../src/emojis.ts";
 
 test("inserir: no cursor, no lugar da seleção e com limites seguros", () => {

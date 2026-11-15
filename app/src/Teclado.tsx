@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { PACOTES, RECENTES_ID, guardarRecentes, lerRecentes, somarRecente } from "./emojis";
 import { mudarVisual } from "./personalizar";
-import { ACENTOS, LETRAS, NUMEROS, TECLADO_ALTURA } from "./teclado";
+import { ACENTOS, LETRAS, NUMEROS, TECLADO_ALTURA } from "./edicaoTeclado";
 import { useVisual } from "./useVisual";
 
 interface Props {

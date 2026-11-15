@@ -4,7 +4,7 @@ import { iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
 import { PapelDeParede } from "../papel";
 import { Teclado } from "../Teclado";
-import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../teclado";
+import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../edicaoTeclado";
 import { useVisual } from "../useVisual";
 
 const horaMsg = (t: number): string => new Date(t).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });

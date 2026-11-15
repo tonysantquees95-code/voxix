@@ -34,11 +34,12 @@ export function faixasDeLuz(modo: ModoLuz, cor: string): { cor: string | null; p
 function Desenho({ id }: { id: string }) {
   const { luz } = useVisual();
   const faixas = faixasDeLuz(luz.modo, luz.cor);
-  const luzes = (d: string) => faixas.map((f, k) => (
-    <path key={k} d={d} pathLength={100} fill="none" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"
-      strokeDasharray={`${f.tam} ${100 - f.tam}`} strokeDashoffset={-f.pos} filter={`url(#b${id})`}
+  // Sem filtro SVG nas faixas que correm: filtro animado repinta a tela toda e deixava os textos com "sombra".
+  const luzes = (d: string) => faixas.flatMap((f, k) => [3, 6.5].map((largura, j) => (
+    <path key={`${k}-${j}`} d={d} pathLength={100} fill="none" strokeWidth={largura} strokeLinejoin="round" strokeLinecap="round" strokeOpacity={j === 0 ? 1 : 0.28}
+      strokeDasharray={`${f.tam} ${100 - f.tam}`} strokeDashoffset={-f.pos}
       className={f.cor ? "luz-faixa" : "luz-faixa luz-rgb"} style={{ stroke: f.cor ?? undefined, animationDelay: `${f.atraso}s` }} />
-  ));
+  )));
   return (
     <g>
       <path d={V_LOGO} style={{ fill: "color-mix(in srgb, var(--color-neon) 16%, #000)", stroke: "var(--color-neon)" }} strokeWidth="2.6" strokeLinejoin="miter" filter={`url(#b${id})`} />
@@ -53,7 +54,7 @@ function Desenho({ id }: { id: string }) {
 export function Logo({ tam = 40, className = "" }: { tam?: number; className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <svg viewBox="-16 -14 148 154" width={tam} height={(tam * 154) / 148} className={className} role="img" aria-label="Voxix">
+    <svg viewBox="-16 -14 148 154" width={tam} height={(tam * 154) / 148} className={`logo-isolado ${className ?? ""}`} role="img" aria-label="Voxix">
       <defs><filter id={`b${id}`} x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="2.6" style={{ floodColor: "var(--color-neon)" }} floodOpacity=".85" /></filter></defs>
       <Desenho id={id} />
     </svg>
@@ -64,7 +65,7 @@ export function Logo({ tam = 40, className = "" }: { tam?: number; className?: s
 export function NomeVoxix({ largura = 200, className = "" }: { largura?: number; className?: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <svg viewBox="-8 -8 236 56" width={largura} height={(largura * 56) / 236} className={className} role="img" aria-label="Voxix">
+    <svg viewBox="-8 -8 236 56" width={largura} height={(largura * 56) / 236} className={`logo-isolado ${className ?? ""}`} role="img" aria-label="Voxix">
       <Defs id={id} />
       <path d={NOME} fill={`url(#g${id})`} style={{ stroke: "var(--color-neon)" }} strokeWidth="2.4" strokeLinejoin="round" fillRule="evenodd" filter={`url(#b${id})`} />
     </svg>

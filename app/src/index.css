@@ -22,6 +22,8 @@ button { cursor: pointer; }
 /* Luz que corre em volta do contorno do logo (o RGB muda de cor enquanto corre). */
 @keyframes luz-corre { to { stroke-dashoffset: -100; } }
 @keyframes luz-matiz { 0%, 100% { stroke: #ff2a2a; } 33% { stroke: #2aff5a; } 66% { stroke: #2a6bff; } }
+/* O logo animado fica na própria camada, para não repintar (e embaçar) o resto da tela. */
+.logo-isolado { transform: translateZ(0); contain: paint; }
 .luz-faixa { animation: luz-corre 4.2s linear infinite; }
 .luz-faixa.luz-rgb { animation: luz-corre 4.2s linear infinite, luz-matiz 5s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .luz-faixa, .luz-faixa.luz-rgb { animation: none; } }

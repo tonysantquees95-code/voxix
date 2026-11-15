@@ -4,7 +4,7 @@ Chat para gamers: conversas privadas, grupos e salas (voz ao vivo só em salas c
 
 - `app/` — interface (React + Vite + Tailwind), compartilhada pelo Android (Capacitor) e pelo Windows (Tauri).
 - `desktop/` — casca do Windows (Tauri, instalador NSIS).
-- Servidor: mora no repositório do servidor da Vênus (`servidor/src/voxix/`), no mesmo Cloudflare Worker (perfis, mensagens ao vivo por Durable Object, bloqueio, denúncia, ditado).
+- Servidor: mora no repositório do servidor, `vetorial-srrvidor` (`servidor/src/voxix/`), no mesmo Cloudflare Worker (perfis, mensagens ao vivo por Durable Object, bloqueio, denúncia, ditado).
 - CI (`.github/workflows/app.yml`): testa, gera `VoxixSetup.exe` e `Voxix.apk` e publica a release `1.N`.
 
 ## Decisões da primeira fase

@@ -12,4 +12,4 @@
 - A apresentação e os termos também ficam em Ajustes › Sobre o Voxix.
 
 ## Servidor
-- O servidor do Voxix mora no repositório da Vênus (`servidor/src/voxix/`), no mesmo Worker. Mudou rota ou regra lá, confira aqui.
+- O servidor do Voxix mora no repositório `vetorial-srrvidor` (`servidor/src/voxix/`), no mesmo Worker. Mudou rota ou regra lá, confira aqui.

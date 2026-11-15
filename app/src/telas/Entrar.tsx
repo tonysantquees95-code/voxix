@@ -3,7 +3,7 @@ import { ErroApi } from "../api";
 import { SITE_DA_CONTA } from "../conta";
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
-import { Logo } from "../logo";
+import { Marca } from "../logo";
 
 export function Entrar() {
   const { entrar } = useVoxix();
@@ -23,9 +23,9 @@ export function Entrar() {
     <div className="grid h-full place-items-center overflow-auto p-6">
       <form onSubmit={(e) => void enviar(e)} className="w-full max-w-sm space-y-4">
         <div className="flex flex-col items-center gap-2 pb-2">
-          <Logo tam={84} />
-          <h1 className="text-2xl font-extrabold tracking-wide">VOXIX</h1>
-          <p className="text-sm text-suave">Gaming Chat · entre com o seu Vetorial ID</p>
+          <h1 className="sr-only">Voxix</h1>
+          <Marca tam={96} />
+          <p className="pt-2 text-sm text-suave">Entre com o seu Vetorial ID</p>
         </div>
         <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" className="w-full rounded-xl border border-borda bg-painel px-4 py-3 outline-none focus:border-neon" />
         <input type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha" className="w-full rounded-xl border border-borda bg-painel px-4 py-3 outline-none focus:border-neon" />

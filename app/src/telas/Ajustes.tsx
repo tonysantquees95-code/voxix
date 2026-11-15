@@ -78,7 +78,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
         <p className="text-xs text-suave">As conversas ficam só neste aparelho. Se você sair da conta, o histórico continua guardado aqui.</p>
         <button onClick={() => void sair()} className="w-full rounded-xl border border-erro py-2.5 font-bold text-erro">Sair da conta</button>
       </div>
-      {personalizando && <Personalizar fechar={() => setPersonalizando(false)} />}
+      {personalizando && <Personalizar fechar={() => setPersonalizando(false)} irParaInicio={fechar} />}
       {ver === "tour" && <div className="fixed inset-0 z-50 flex flex-col bg-fundo p-5" onClick={(e) => e.stopPropagation()}><div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"><Tour rotuloFinal="Fechar" aoTerminar={() => setVer(null)} aoFechar={() => setVer(null)} /></div></div>}
       {ver === "termos" && <Termos aoFechar={() => setVer(null)} />}
       {ver === "novidades" && <Novidades itens={[...NOVIDADES].sort((a, b) => b.id - a.id)} aoFechar={() => setVer(null)} />}

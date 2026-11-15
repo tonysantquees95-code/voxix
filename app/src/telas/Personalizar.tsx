@@ -10,14 +10,14 @@ import { Teclado } from "../Teclado";
 import { useVisual } from "../useVisual";
 
 type Aba = "cores" | "formato" | "fundo" | "emojis" | "teclado";
-const ABAS: { id: Aba; nome: string }[] = [
-  { id: "cores", nome: "Cores" }, { id: "formato", nome: "Formato" }, { id: "fundo", nome: "Fundo" }, { id: "emojis", nome: "Emojis" }, { id: "teclado", nome: "Teclado" },
+const ABAS: { id: Aba; nome: string; icone: string }[] = [
+  { id: "cores", nome: "Cores", icone: "🎨" }, { id: "formato", nome: "Formato", icone: "⬡" }, { id: "fundo", nome: "Fundo", icone: "🖼️" }, { id: "emojis", nome: "Emojis", icone: "😀" }, { id: "teclado", nome: "Teclado", icone: "⌨️" },
 ];
 
-function Chip({ ativo, onClick, children, rotulo }: { ativo: boolean; onClick: () => void; children: ReactNode; rotulo?: string }) {
+function Chip({ ativo, onClick, children, rotulo, cheio }: { ativo: boolean; onClick: () => void; children: ReactNode; rotulo?: string; cheio?: boolean }) {
   return (
     <button type="button" role="radio" aria-checked={ativo} aria-label={rotulo} onClick={onClick}
-      className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm ${ativo ? "border-neon bg-neon/15 font-bold text-texto" : "border-borda text-suave"}`}>{children}</button>
+      className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm ${cheio ? "w-full" : ""} ${ativo ? "border-neon bg-neon/15 font-bold text-texto" : "border-borda text-suave"}`}>{children}</button>
   );
 }
 function Interruptor({ ligado, aoMudar, titulo, dica }: { ligado: boolean; aoMudar: (v: boolean) => void; titulo: string; dica?: string }) {
@@ -82,8 +82,8 @@ function AbaCores() {
       <div className="space-y-2">
         <Interruptor ligado={v.tempestade} aoMudar={(x) => mudarVisual({ tempestade: x })} titulo="Tempestade atrás do logo" dica="Luz neon na cor escolhida que pisca forte e fraca, como trovões." />
         {v.tempestade && (
-          <div className="flex gap-2" role="radiogroup" aria-label="Força da tempestade">
-            {FORCAS.map((f) => <div key={f.id} className="flex-1"><Chip ativo={v.forca === f.id} onClick={() => mudarVisual({ forca: f.id })}>{f.nome}</Chip></div>)}
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Força da tempestade">
+            {FORCAS.map((f) => <Chip key={f.id} cheio ativo={v.forca === f.id} onClick={() => mudarVisual({ forca: f.id })}>{f.nome}</Chip>)}
           </div>
         )}
       </div>
@@ -136,9 +136,9 @@ function AbaFundo() {
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2" role="radiogroup" aria-label="Qual tela">
-        <div className="flex-1"><Chip ativo={qual === "inicio"} onClick={() => setQual("inicio")}>Tela inicial</Chip></div>
-        <div className="flex-1"><Chip ativo={qual === "conversa"} onClick={() => setQual("conversa")}>Conversas</Chip></div>
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Qual tela">
+        <Chip cheio ativo={qual === "inicio"} onClick={() => setQual("inicio")}>Tela inicial</Chip>
+        <Chip cheio ativo={qual === "conversa"} onClick={() => setQual("conversa")}>Conversas</Chip>
       </div>
       <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Modelo do fundo">
         {MODELOS_PAPEL.map((m) => (
@@ -199,24 +199,24 @@ function AbaTeclado() {
       <Interruptor ligado={t.noPc} aoMudar={(x) => mudarTeclado({ noPc: x })} titulo="Mostrar também no computador" dica="Normalmente ele aparece só em telas de toque." />
       <div>
         <p className="mb-1 text-xs text-suave">Formato das teclas</p>
-        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Formato das teclas">{formas.map((f) => <Chip key={f.id} ativo={t.forma === f.id} onClick={() => mudarTeclado({ forma: f.id })}>{f.nome}</Chip>)}</div>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Formato das teclas">{formas.map((f) => <Chip key={f.id} cheio ativo={t.forma === f.id} onClick={() => mudarTeclado({ forma: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       <div>
         <p className="mb-1 text-xs text-suave">Ao tocar numa tecla</p>
-        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Efeito ao tocar">{efeitos.map((f) => <Chip key={f.id} ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Efeito ao tocar">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       {t.efeito === "led" && (
         <div className="space-y-2">
           <p className="text-xs text-suave">Cor do LED</p>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Cor do LED">{leds.map((f) => <Chip key={f.id} ativo={t.led === f.id} onClick={() => mudarTeclado({ led: f.id })}>{f.nome}</Chip>)}</div>
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Cor do LED">{leds.map((f) => <Chip key={f.id} cheio ativo={t.led === f.id} onClick={() => mudarTeclado({ led: f.id })}>{f.nome}</Chip>)}</div>
           {t.led === "cor" && <SeletorRgb valor={t.ledCor} aoMudar={(h) => mudarTeclado({ ledCor: h })} />}
         </div>
       )}
       <Interruptor ligado={t.vibrar} aoMudar={(x) => mudarTeclado({ vibrar: x })} titulo="Vibrar ao tocar" dica="Uma batidinha leve em cada tecla." />
       <div>
         <p className="mb-1 text-xs text-suave">Altura das teclas</p>
-        <div className="flex gap-2" role="radiogroup" aria-label="Altura das teclas">
-          {(["baixa", "media", "alta"] as const).map((a) => <div key={a} className="flex-1"><Chip ativo={t.altura === a} onClick={() => mudarTeclado({ altura: a })}>{a === "baixa" ? "Baixa" : a === "media" ? "Média" : "Alta"}</Chip></div>)}
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Altura das teclas">
+          {(["baixa", "media", "alta"] as const).map((a) => <Chip key={a} cheio ativo={t.altura === a} onClick={() => mudarTeclado({ altura: a })}>{a === "baixa" ? "Baixa" : a === "media" ? "Média" : "Alta"}</Chip>)}
         </div>
       </div>
       <div>
@@ -230,30 +230,34 @@ function AbaTeclado() {
   );
 }
 
-export function Personalizar({ fechar }: { fechar: () => void }) {
+/** Tela cheia e de tamanho fixo: trocar de aba só muda o conteúdo, nunca o tamanho da tela. */
+export function Personalizar({ fechar, irParaInicio }: { fechar: () => void; irParaInicio: () => void }) {
   const [aba, setAba] = useState<Aba>("cores");
   const [confirmar, setConfirmar] = useState(false);
   return (
-    <div className="fixed inset-0 z-20 grid place-items-center bg-black/75 p-3" onClick={(e) => { e.stopPropagation(); fechar(); }}>
-      <div onClick={(e) => e.stopPropagation()} className="flex max-h-full w-full max-w-md flex-col overflow-hidden rounded-2xl border border-borda bg-painel" role="dialog" aria-label="Personalizar o Voxix">
-        <div className="flex items-center justify-between gap-3 px-4 pt-4">
-          <h2 className="text-lg font-extrabold">Personalizar</h2>
-          <button onClick={fechar} aria-label="Fechar" className="text-xl text-suave">✕</button>
-        </div>
-        <div className="flex justify-center py-2"><LogoTempestade tam={64} /></div>
-        <div className="rolagem flex gap-1.5 overflow-x-auto px-4 pb-2" role="tablist" aria-label="Seções">
-          {ABAS.map((a) => (
-            <button key={a.id} type="button" role="tab" aria-selected={aba === a.id} onClick={() => setAba(a.id)}
-              className={`flex-none rounded-full border px-3.5 py-1.5 text-sm ${aba === a.id ? "border-neon bg-neon text-white font-bold" : "border-borda text-suave"}`}>{a.nome}</button>
-          ))}
-        </div>
-        <div className="rolagem min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-2">
+    <div className="fixed inset-0 z-20 flex flex-col bg-fundo" role="dialog" aria-label="Personalizar o Voxix" onClick={(e) => e.stopPropagation()}>
+      <header className="flex flex-none items-center gap-2 border-b border-borda bg-painel px-3 py-2">
+        <button onClick={fechar} aria-label="Voltar aos ajustes" className="rounded-xl border border-borda px-3 py-2 text-sm">‹ Voltar</button>
+        <h2 className="min-w-0 flex-1 truncate text-center text-lg font-extrabold">Personalizar</h2>
+        <button onClick={irParaInicio} aria-label="Ir para o início" className="rounded-xl bg-neon px-3 py-2 text-sm font-bold text-white">🏠 Início</button>
+      </header>
+      <div className="flex flex-none justify-center bg-painel/60 py-3"><LogoTempestade tam={56} /></div>
+      <nav className="grid flex-none grid-cols-5 gap-1 border-b border-borda bg-painel px-2 pb-2" role="tablist" aria-label="Seções">
+        {ABAS.map((a) => (
+          <button key={a.id} type="button" role="tab" aria-selected={aba === a.id} onClick={() => setAba(a.id)}
+            className={`flex flex-col items-center gap-0.5 rounded-xl border px-1 py-1.5 text-xs ${aba === a.id ? "border-neon bg-neon/15 font-bold text-texto" : "border-transparent text-suave"}`}>
+            <span className="text-lg leading-none" aria-hidden="true">{a.icone}</span>{a.nome}
+          </button>
+        ))}
+      </nav>
+      <div className="rolagem min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-xl px-4 py-4">
           {aba === "cores" && <AbaCores />}
           {aba === "formato" && <AbaFormato />}
           {aba === "fundo" && <AbaFundo />}
           {aba === "emojis" && <AbaEmojis />}
           {aba === "teclado" && <AbaTeclado />}
-          <div className="mt-5 border-t border-borda pt-3">
+          <div className="mt-6 border-t border-borda pt-3">
             {confirmar ? (
               <div className="flex items-center gap-2 text-sm">
                 <span className="flex-1">Voltar tudo ao padrão do Voxix?</span>

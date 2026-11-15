@@ -13,6 +13,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 6, data: "2026-11-14", tipo: "melhoria", titulo: "Logo e ícone refeitos", texto: "O V com X ficou igual ao conceito: asas largas, o X no meio e a ponta embaixo, no ícone do app e na tela de entrada. A tempestade agora é só a luz neon atrás do logo, sem os raiozinhos nos lados." },
   { id: 7, data: "2026-11-14", tipo: "novo", titulo: "Personalização completa", texto: "Em Ajustes › Personalizar: escolha entre cores prontas ou crie a sua com as barras de vermelho, verde e azul (o emblema e a tempestade trocam junto), mude o formato dos ícones (redondinho, quadradinho ou futurista), ponha papel de parede na tela inicial e nas conversas, veja os pacotes de emojis e use o teclado do Voxix, com LED colorido ao tocar." },
   { id: 8, data: "2026-11-14", tipo: "correcao", titulo: "Procurar atualizações", texto: "Agora o app diz “Você já está na versão mais nova” quando não há nada novo, e só fala em falta de conexão quando realmente não consegue falar com a internet." },
+  { id: 9, data: "2026-11-14", tipo: "melhoria", titulo: "Personalizar em tela cheia", texto: "A tela de Personalizar agora ocupa a tela toda e não muda de tamanho quando você troca de seção. Tem um botão Voltar e outro Início, as opções ficaram alinhadas e a prévia dos formatos mostra cada um do jeito certo." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

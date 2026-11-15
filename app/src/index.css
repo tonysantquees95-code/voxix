@@ -19,16 +19,14 @@ button { cursor: pointer; }
 @keyframes pulsa { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .55; transform: scale(1.12); } }
 .gravando { animation: pulsa 1s ease-in-out infinite; }
 
-/* Tempestade atrás do logo: duas luzes (cor do tema) que alternam entre forte e fraca em tempos diferentes, mais raios que acendem junto com o trovão. */
+/* Tempestade atrás do logo: duas luzes (cor do tema) que alternam entre forte e fraca em tempos diferentes. */
 .tempestade { position: relative; display: inline-grid; place-items: center; --alcance: -38%; }
 .tempestade[data-forca="fraca"] { --alcance: -24%; }
 .tempestade[data-forca="forte"] { --alcance: -55%; }
 .tempestade::before, .tempestade::after { content: ""; position: absolute; inset: var(--alcance); border-radius: 50%; pointer-events: none; z-index: 0; }
 .tempestade::before { background: radial-gradient(closest-side, color-mix(in srgb, var(--color-neon) 90%, transparent), transparent 72%); filter: blur(10px); animation: trovao-a 6.1s linear infinite; }
 .tempestade::after { background: radial-gradient(closest-side, color-mix(in srgb, var(--color-magenta) 85%, transparent), transparent 74%); filter: blur(16px); animation: trovao-b 8.3s linear infinite; }
-.tempestade > svg:not(.raios) { position: relative; z-index: 2; }
-.tempestade .raios { position: absolute; inset: -22%; width: 144%; height: 144%; z-index: 1; fill: none; stroke: #fff; stroke-width: 1.2; stroke-linejoin: bevel; opacity: 0; filter: drop-shadow(0 0 4px var(--color-neon)) drop-shadow(0 0 10px var(--color-neon)); animation: raio 6.1s linear infinite; }
+.tempestade > svg { position: relative; z-index: 2; }
 @keyframes trovao-a { 0%, 100% { opacity: .22; } 5% { opacity: 1; } 7% { opacity: .3; } 10% { opacity: .9; } 13% { opacity: .25; } 48% { opacity: .3; } 50% { opacity: .85; } 52% { opacity: .28; } 53% { opacity: 1; } 58% { opacity: .22; } 85% { opacity: .35; } 87% { opacity: .7; } 90% { opacity: .22; } }
 @keyframes trovao-b { 0%, 100% { opacity: .3; } 22% { opacity: .25; } 24% { opacity: 1; } 26% { opacity: .35; } 29% { opacity: .8; } 34% { opacity: .28; } 61% { opacity: .3; } 63% { opacity: .95; } 66% { opacity: .3; } 92% { opacity: .75; } 95% { opacity: .3; } }
-@keyframes raio { 0%, 4%, 8%, 100% { opacity: 0; } 5% { opacity: .95; } 6.5% { opacity: .2; } 7% { opacity: .8; } 49%, 52% { opacity: 0; } 50% { opacity: .9; } 51% { opacity: .15; } }
-@media (prefers-reduced-motion: reduce) { .tempestade::before, .tempestade::after, .tempestade .raios { animation: none; } .tempestade::before { opacity: .6; } .tempestade::after { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .tempestade::before, .tempestade::after { animation: none; } .tempestade::before { opacity: .6; } .tempestade::after { opacity: .5; } }

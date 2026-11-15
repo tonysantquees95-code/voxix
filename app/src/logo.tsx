@@ -11,17 +11,16 @@ function Defs({ id }: { id: string }) {
   );
 }
 
-const MARCA = "M2 4 L34 14 L60 76 L86 14 L118 4 L73 100 L60 110 L47 100 Z";
-const X = "M44 26 L76 62 M76 26 L44 62";
+const MARCA = "M2 4 L40 10 L60 36 L80 10 L118 4 L96 68 L72 68 L60 80 L48 68 L24 68 Z M42 76 L78 76 L60 112 Z";
+const X = "M49 42 L71 64 M71 42 L49 64";
 const NOME = "M0 0 L12 0 L22 28 L32 0 L44 0 L28 40 L16 40 Z M60 0 L88 0 L96 8 L96 32 L88 40 L60 40 L52 32 L52 8 Z M66 10 L82 10 L84 12 L84 28 L82 30 L66 30 L64 28 L64 12 Z M104 0 L116 0 L126 15 L136 0 L148 0 L132 20 L148 40 L136 40 L126 25 L116 40 L104 40 L120 20 Z M156 0 L168 0 L168 40 L156 40 Z M176 0 L188 0 L198 15 L208 0 L220 0 L204 20 L220 40 L208 40 L198 25 L188 40 L176 40 L192 20 Z";
 
 function Desenho({ id }: { id: string }) {
   return (
     <g>
       <path d={MARCA} fill={`url(#g${id})`} stroke="#ff2d3d" strokeWidth="3.2" strokeLinejoin="round" filter={`url(#b${id})`} />
-      <path d={X} stroke="#ff2d3d" strokeWidth="13" strokeLinecap="round" fill="none" />
-      <path d={X} stroke="#2a0b4d" strokeWidth="7" strokeLinecap="round" fill="none" />
-      <path d={X} stroke="#fff" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity=".85" />
+      <path d={X} stroke="#ff2d3d" strokeWidth="11" strokeLinecap="square" fill="none" />
+      <path d={X} stroke="#2a0b4d" strokeWidth="5.5" strokeLinecap="square" fill="none" />
     </g>
   );
 }
@@ -65,10 +64,6 @@ export function LogoTempestade({ tam = 120, className = "" }: { tam?: number; cl
   if (!v.tempestade) return <Logo tam={tam} className={className} />;
   return (
     <span className={`tempestade ${className}`} data-forca={v.forca} style={{ width: tam, height: (tam * 120) / 130 }}>
-      <svg className="raios" viewBox="0 0 100 100" aria-hidden="true">
-        <polyline points="30,0 17,24 32,28 8,58 24,62 4,96" />
-        <polyline points="76,2 90,26 74,31 96,60 80,64 94,98" />
-      </svg>
       <Logo tam={tam} />
     </span>
   );

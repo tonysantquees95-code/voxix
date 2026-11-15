@@ -10,6 +10,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 3, data: "2026-11-14", tipo: "melhoria", titulo: "Logo novo do Voxix", texto: "O Voxix ganhou a identidade nova: o V com X em roxo escuro com contorno vermelho brilhante, o nome VOXIX em letras angulares e o selo Gaming Chat. Aparece na tela de entrada, no ícone do app e na abertura." },
   { id: 4, data: "2026-11-14", tipo: "melhoria", titulo: "Cores novas", texto: "O Voxix inteiro agora usa as cores do logo: vermelho brilhante e roxo escuro, nos botões, nas mensagens, nos destaques e nas telas." },
   { id: 5, data: "2026-11-14", tipo: "novo", titulo: "Personalizar e tempestade", texto: "Em Ajustes › Personalizar você escolhe a cor do Voxix e liga a tempestade: uma luz neon atrás do logo que pisca forte e fraca, como trovões. Dá para escolher a força (suave, média ou forte) ou desligar." },
+  { id: 6, data: "2026-11-14", tipo: "melhoria", titulo: "Logo e ícone refeitos", texto: "O V com X ficou igual ao conceito: asas largas, o X no meio e a ponta embaixo, no ícone do app e na tela de entrada. A tempestade agora é só a luz neon atrás do logo, sem os raiozinhos nos lados." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

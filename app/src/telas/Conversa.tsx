@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { api, ErroApi } from "../api";
 import { iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
+import { PapelDeParede } from "../papel";
+import { Teclado } from "../Teclado";
+import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../teclado";
+import { useVisual } from "../useVisual";
 
 const horaMsg = (t: number): string => new Date(t).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
@@ -14,6 +18,11 @@ export function Conversa({ apelido }: { apelido: string }) {
   const [denuncia, setDenuncia] = useState(false);
   const [ouvindo, setOuvindo] = useState(false);
   const ditado = useRef<Ditado | null>(null);
+  const caixa = useRef<HTMLTextAreaElement>(null);
+  const visual = useVisual();
+  const [tecladoAberto, setTecladoAberto] = useState(false);
+  // teclado do Voxix: no celular sempre que ligado; no computador só se a pessoa pedir
+  const proprio = visual.teclado.usar && (visual.teclado.noPc || (typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches));
   const fim = useRef<HTMLDivElement>(null);
   const mensagens = conversa?.mensagens ?? [];
 
@@ -31,6 +40,15 @@ export function Conversa({ apelido }: { apelido: string }) {
     setAviso("");
     try { await enviar(apelido, t); } catch (e) { setAviso(e instanceof ErroApi ? e.message : "Não consegui enviar. Toque na mensagem para tentar de novo."); }
   };
+
+  const editar = (f: (t: string, i: number, j: number) => Edicao) => {
+    const el = caixa.current;
+    const focado = !!el && document.activeElement === el;
+    const r = f(texto, focado ? (el?.selectionStart ?? texto.length) : texto.length, focado ? (el?.selectionEnd ?? texto.length) : texto.length);
+    setTexto(r.texto.slice(0, 2000));
+    requestAnimationFrame(() => { try { el?.setSelectionRange(r.pos, r.pos); } catch { /* campo fora da tela */ } });
+  };
+  const posCursor = () => (caixa.current && document.activeElement === caixa.current ? (caixa.current.selectionStart ?? texto.length) : texto.length);
 
   const alternarMicrofone = async () => {
     if (ouvindo) { await ditado.current?.parar(); return; }
@@ -60,7 +78,7 @@ export function Conversa({ apelido }: { apelido: string }) {
     <>
       <header className="flex items-center gap-3 border-b border-borda bg-painel px-3 py-2.5">
         <button onClick={() => abrir(null)} aria-label="Voltar" className="grid h-9 w-9 place-items-center rounded-full text-xl md:hidden">←</button>
-        <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{conversa.nome.slice(0, 1).toUpperCase()}</span>
+        <span className="avatar grid h-10 w-10 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{conversa.nome.slice(0, 1).toUpperCase()}</span>
         <div className="min-w-0 flex-1"><div className="truncate font-bold leading-tight">{conversa.nome}</div><div className="text-xs text-suave">@{conversa.apelido}</div></div>
         <div className="relative">
           <button onClick={() => setMenu((m) => !m)} aria-label="Mais opções" className="grid h-9 w-9 place-items-center rounded-full text-xl">⋮</button>
@@ -74,11 +92,12 @@ export function Conversa({ apelido }: { apelido: string }) {
         </div>
       </header>
 
-      <div className="rolagem min-h-0 flex-1 space-y-1.5 overflow-y-auto px-3 py-3">
+      <div className="relative min-h-0 flex-1"><PapelDeParede qual="conversa" />
+      <div className="rolagem absolute inset-0 z-[1] space-y-1.5 overflow-y-auto px-3 py-3">
         {mensagens.length === 0 && <p className="py-10 text-center text-sm text-suave">Diga oi para {conversa.nome}!</p>}
         {mensagens.map((m) => (
           <div key={m.id} className={`flex ${m.minha ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-[15px] ${m.minha ? "balao-meu rounded-br-md" : "rounded-bl-md border border-borda bg-painel"}`}>
+            <div className={`balao max-w-[80%] whitespace-pre-wrap break-words px-3.5 py-2 text-[15px] ${m.minha ? "balao-meu" : "border border-borda bg-painel"}`}>
               {m.corpo}
               <div className={`mt-0.5 text-right text-[10px] ${m.minha ? "text-white/70" : "text-suave"}`}>
                 {horaMsg(m.criado)}{m.minha && (m.estado === "enviando" ? " · enviando…" : m.estado === "enviada" ? " ✓" : "")}
@@ -88,14 +107,20 @@ export function Conversa({ apelido }: { apelido: string }) {
           </div>
         ))}
         <div ref={fim} />
-      </div>
+      </div></div>
 
       {aviso && <p className="px-4 pb-1 text-xs text-aviso" role="status">{aviso}</p>}
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="flex items-end gap-2 border-t border-borda bg-painel p-2.5">
-        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`grid h-11 w-11 flex-none place-items-center rounded-full border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}>🎤</button>
-        <textarea value={texto} onChange={(e) => setTexto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); } }} rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-borda bg-fundo px-4 py-2.5 outline-none focus:border-neon" />
-        <button disabled={!texto.trim()} className="grid h-11 w-11 flex-none place-items-center rounded-full bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar">➤</button>
+        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}>🎤</button>
+        <textarea ref={caixa} inputMode={proprio ? "none" : undefined} onFocus={() => setTecladoAberto(true)} onClick={() => setTecladoAberto(true)} value={texto} onChange={(e) => setTexto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); } }} rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} className="max-h-32 balao min-h-11 flex-1 resize-none border border-borda bg-fundo px-4 py-2.5 outline-none focus:border-neon" />
+        <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar">➤</button>
       </form>
+      {proprio && tecladoAberto && (
+        <>
+          <button type="button" onClick={() => { setTecladoAberto(false); caixa.current?.blur(); }} className="w-full border-t border-borda bg-painel py-1 text-xs text-suave" aria-label="Fechar o teclado">⌄ fechar teclado</button>
+          <Teclado aoInserir={(x) => editar((t, i, j) => inserir(t, i, j, x))} aoApagar={() => editar(apagarTexto)} aoEnviar={() => void mandar()} inicioDeFrase={comecaFrase(texto, posCursor())} podeEnviar={!!texto.trim()} />
+        </>
+      )}
 
       {denuncia && sessao && <Denuncia apelido={apelido} trecho={mensagens.filter((m) => !m.minha).slice(-10).map((m) => m.corpo).join("\n")} token={sessao.token} fechar={() => setDenuncia(false)} aoEnviar={() => setAviso("Denúncia enviada. Obrigado por avisar.")} />}
     </>

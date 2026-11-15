@@ -4,8 +4,7 @@ import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atua
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
 import { LogoTempestade } from "../logo";
-import { FORCAS, TEMAS, mudarVisual } from "../personalizar";
-import { useVisual } from "../useVisual";
+import { Personalizar } from "./Personalizar";
 import { NOVIDADES } from "../novidades";
 import { Novidades } from "./Novidades";
 import { Termos, Tour } from "./Apresentacao";
@@ -16,7 +15,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   const [versao, setVersao] = useState("");
   const [novaVersao, setNovaVersao] = useState(false);
   const [ver, setVer] = useState<"tour" | "termos" | "novidades" | null>(null);
-  const visual = useVisual();
+  const [personalizando, setPersonalizando] = useState(false);
 
   useEffect(() => { if (sessao) void api.bloqueios(sessao.token).then((r) => setBloqueados(r.bloqueios)).catch(() => setBloqueados([])); }, [sessao]);
 
@@ -27,12 +26,17 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   };
   const procurar = async () => {
     setVersao("Procurando…");
-    try {
-      const v = await procurarVersao();
-      if (!v) setVersao("Não consegui consultar agora.");
-      else if (haNovaVersao(BUILD, v.numero)) { setNovaVersao(true); setVersao(`Versão nova: 1.${v.numero}`); }
-      else setVersao("Você está com a versão mais nova.");
-    } catch { setVersao("Não consegui consultar agora."); }
+    let falha: "rede" | "servidor" | null = null;
+    for (let tentativa = 0; tentativa < 2; tentativa++) {
+      try {
+        const v = await procurarVersao();
+        if (!v) { falha = "servidor"; continue; }
+        if (haNovaVersao(BUILD, v.numero)) { setNovaVersao(true); setVersao(`Versão nova disponível: 1.${v.numero}. Toque em Baixar.`); }
+        else { setNovaVersao(false); setVersao("Você já está na versão mais nova."); }
+        return;
+      } catch { falha = "rede"; }
+    }
+    setVersao(falha === "rede" ? "Sem conexão com a internet agora. Confira o Wi-Fi ou os dados e tente de novo." : "O servidor não respondeu agora. Tente de novo em instantes.");
   };
 
   return (
@@ -42,21 +46,11 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
         <section><h3 className="text-sm font-bold text-suave">Conta</h3><p className="mt-1">@{perfil?.apelido} · {perfil?.nome}</p><p className="text-xs text-suave">{sessao?.email}</p></section>
         <section>
           <h3 className="text-sm font-bold text-suave">Personalizar</h3>
-          <div className="mt-2 flex justify-center py-3"><LogoTempestade tam={72} /></div>
-          <p className="text-xs text-suave">Cor do aplicativo</p>
-          <div className="mt-1 flex flex-wrap gap-2" role="radiogroup" aria-label="Cor do aplicativo">
-            {TEMAS.map((t) => (
-              <button key={t.id} role="radio" aria-checked={visual.tema === t.id} onClick={() => mudarVisual({ tema: t.id })} className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm ${visual.tema === t.id ? "border-neon" : "border-borda"}`}>
-                <span className="h-4 w-4 rounded-full" style={{ background: `linear-gradient(135deg, ${t.neon}, ${t.magenta})` }} />{t.nome}
-              </button>
-            ))}
-          </div>
-          <label className="mt-3 flex items-center justify-between gap-3 text-sm"><span>Tempestade atrás do logo<span className="block text-xs text-suave">Luz neon que pisca forte e fraca, como trovões.</span></span><input type="checkbox" checked={visual.tempestade} onChange={(e) => mudarVisual({ tempestade: e.target.checked })} className="h-5 w-5 accent-neon" /></label>
-          {visual.tempestade && (
-            <div className="mt-2 flex gap-2" role="radiogroup" aria-label="Força da tempestade">
-              {FORCAS.map((f) => <button key={f.id} role="radio" aria-checked={visual.forca === f.id} onClick={() => mudarVisual({ forca: f.id })} className={`flex-1 rounded-xl border px-3 py-1.5 text-sm ${visual.forca === f.id ? "border-neon" : "border-borda"}`}>{f.nome}</button>)}
-            </div>
-          )}
+          <button onClick={() => setPersonalizando(true)} className="mt-2 flex w-full items-center gap-3 rounded-xl border border-borda px-4 py-3 text-left">
+            <LogoTempestade tam={40} />
+            <span className="min-w-0 flex-1"><b className="block">Cores, formato, fundo e teclado</b><span className="block text-xs text-suave">Cor com RGB, formato dos ícones, papel de parede, emojis e o teclado do Voxix.</span></span>
+            <span className="text-suave">›</span>
+          </button>
         </section>
         <section>
           <h3 className="text-sm font-bold text-suave">Bloqueados</h3>
@@ -84,6 +78,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
         <p className="text-xs text-suave">As conversas ficam só neste aparelho. Se você sair da conta, o histórico continua guardado aqui.</p>
         <button onClick={() => void sair()} className="w-full rounded-xl border border-erro py-2.5 font-bold text-erro">Sair da conta</button>
       </div>
+      {personalizando && <Personalizar fechar={() => setPersonalizando(false)} />}
       {ver === "tour" && <div className="fixed inset-0 z-50 flex flex-col bg-fundo p-5" onClick={(e) => e.stopPropagation()}><div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"><Tour rotuloFinal="Fechar" aoTerminar={() => setVer(null)} aoFechar={() => setVer(null)} /></div></div>}
       {ver === "termos" && <Termos aoFechar={() => setVer(null)} />}
       {ver === "novidades" && <Novidades itens={[...NOVIDADES].sort((a, b) => b.id - a.id)} aoFechar={() => setVer(null)} />}

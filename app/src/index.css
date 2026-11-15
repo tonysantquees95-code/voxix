@@ -30,3 +30,44 @@ button { cursor: pointer; }
 @keyframes trovao-a { 0%, 100% { opacity: .22; } 5% { opacity: 1; } 7% { opacity: .3; } 10% { opacity: .9; } 13% { opacity: .25; } 48% { opacity: .3; } 50% { opacity: .85; } 52% { opacity: .28; } 53% { opacity: 1; } 58% { opacity: .22; } 85% { opacity: .35; } 87% { opacity: .7; } 90% { opacity: .22; } }
 @keyframes trovao-b { 0%, 100% { opacity: .3; } 22% { opacity: .25; } 24% { opacity: 1; } 26% { opacity: .35; } 29% { opacity: .8; } 34% { opacity: .28; } 61% { opacity: .3; } 63% { opacity: .95; } 66% { opacity: .3; } 92% { opacity: .75; } 95% { opacity: .3; } }
 @media (prefers-reduced-motion: reduce) { .tempestade::before, .tempestade::after { animation: none; } .tempestade::before { opacity: .6; } .tempestade::after { opacity: .5; } }
+
+/* ---- formato dos ícones, avatares, balões e botões (Ajustes › Personalizar › Formato) ---- */
+:root { --r-balao: 1.1rem; --r-avatar: 9999px; --r-botao: 9999px; --r-tecla: .8rem; }
+[data-formato="quadrado"] { --r-balao: .3rem; --r-avatar: .4rem; --r-botao: .4rem; }
+[data-formato="futurista"] { --r-balao: .3rem; --r-avatar: .3rem; --r-botao: .3rem; }
+[data-forma="quadrada"] { --r-tecla: .25rem; }
+[data-forma="futurista"] { --r-tecla: .3rem; }
+.avatar { border-radius: var(--r-avatar); }
+.botao-redondo { border-radius: var(--r-botao); }
+.balao { border-radius: var(--r-balao); }
+[data-formato="futurista"] .avatar { clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%); border-radius: 0; }
+[data-formato="futurista"] .balao { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
+
+/* ---- papel de parede (início e conversa) ---- */
+.papel { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-size: cover; background-position: center; }
+.papel-aurora { background: radial-gradient(60% 45% at 15% 10%, color-mix(in srgb, var(--color-neon) 38%, transparent), transparent 70%), radial-gradient(55% 45% at 90% 85%, color-mix(in srgb, var(--color-magenta) 40%, transparent), transparent 70%); }
+.papel-grade { background-image: linear-gradient(color-mix(in srgb, var(--color-neon) 16%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--color-neon) 16%, transparent) 1px, transparent 1px); background-size: 28px 28px; }
+.papel-circuito { background-image: repeating-linear-gradient(45deg, color-mix(in srgb, var(--color-neon) 14%, transparent) 0 1px, transparent 1px 22px), repeating-linear-gradient(-45deg, color-mix(in srgb, var(--color-magenta) 14%, transparent) 0 1px, transparent 1px 22px), radial-gradient(circle, color-mix(in srgb, var(--color-neon) 40%, transparent) 1.5px, transparent 2px); background-size: auto, auto, 44px 44px; }
+.papel-pontos { background-image: radial-gradient(circle, color-mix(in srgb, var(--color-neon) 35%, transparent) 1.5px, transparent 2px); background-size: 20px 20px; }
+.papel-tempestade { background: radial-gradient(50% 35% at 50% 0%, color-mix(in srgb, var(--color-neon) 45%, transparent), transparent 75%), radial-gradient(40% 30% at 85% 100%, color-mix(in srgb, var(--color-magenta) 45%, transparent), transparent 75%), repeating-linear-gradient(100deg, transparent 0 40px, color-mix(in srgb, var(--color-neon) 8%, transparent) 40px 42px); }
+.papel-sombra { position: absolute; inset: 0; pointer-events: none; z-index: 0; background: #000; }
+
+/* ---- teclado do Voxix ---- */
+.teclado { padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--color-painel) 94%, var(--color-neon)); border-top: 1px solid var(--color-borda); user-select: none; -webkit-user-select: none; touch-action: manipulation; position: relative; }
+.linha-tecla { display: flex; gap: 5px; margin-bottom: 5px; }
+.tecla { --led: var(--color-neon); height: var(--alt-tecla, 46px); min-width: 0; display: grid; place-items: center; font-size: 1.05rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); transition: transform .08s; -webkit-tap-highlight-color: transparent; }
+.tecla:active { transform: scale(.93); }
+.tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: .95rem; }
+.tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
+.tecla-enviar { background: var(--color-neon); border-color: var(--color-neon); color: #fff; font-size: 1.15rem; }
+[data-forma="futurista"] .tecla { clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px)); }
+.tecla.tocou { animation: led-tecla .45s ease-out; }
+@keyframes led-tecla { 0% { box-shadow: 0 0 0 0 var(--led), 0 0 18px 4px var(--led); border-color: var(--led); background: color-mix(in srgb, var(--led) 35%, var(--color-painel)); } 100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; } }
+.popup-acento { position: absolute; left: 6px; right: 6px; top: -52px; display: flex; gap: 4px; padding: 6px; background: var(--color-painel); border: 1px solid var(--color-neon); border-radius: var(--r-balao); z-index: 5; }
+.popup-acento button { flex: 1; height: 38px; font-size: 1.15rem; border-radius: var(--r-tecla); background: color-mix(in srgb, var(--color-neon) 20%, transparent); color: var(--color-texto); }
+.pacote { flex: none; width: 38px; height: 34px; font-size: 1.2rem; border-radius: var(--r-tecla); border: 1px solid transparent; }
+.pacote-ativo { border-color: var(--color-neon); background: color-mix(in srgb, var(--color-neon) 18%, transparent); }
+.grade-emoji { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; overflow-y: auto; margin-bottom: 5px; }
+.emoji { height: 40px; font-size: 1.5rem; border-radius: var(--r-tecla); }
+.emoji:active { background: color-mix(in srgb, var(--color-neon) 25%, transparent); }
+@media (prefers-reduced-motion: reduce) { .tecla.tocou { animation: none; } }

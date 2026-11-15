@@ -11,6 +11,8 @@ export const NOVIDADES: Novidade[] = [
   { id: 4, data: "2026-11-14", tipo: "melhoria", titulo: "Cores novas", texto: "O Voxix inteiro agora usa as cores do logo: vermelho brilhante e roxo escuro, nos botões, nas mensagens, nos destaques e nas telas." },
   { id: 5, data: "2026-11-14", tipo: "novo", titulo: "Personalizar e tempestade", texto: "Em Ajustes › Personalizar você escolhe a cor do Voxix e liga a tempestade: uma luz neon atrás do logo que pisca forte e fraca, como trovões. Dá para escolher a força (suave, média ou forte) ou desligar." },
   { id: 6, data: "2026-11-14", tipo: "melhoria", titulo: "Logo e ícone refeitos", texto: "O V com X ficou igual ao conceito: asas largas, o X no meio e a ponta embaixo, no ícone do app e na tela de entrada. A tempestade agora é só a luz neon atrás do logo, sem os raiozinhos nos lados." },
+  { id: 7, data: "2026-11-14", tipo: "novo", titulo: "Personalização completa", texto: "Em Ajustes › Personalizar: escolha entre cores prontas ou crie a sua com as barras de vermelho, verde e azul (o emblema e a tempestade trocam junto), mude o formato dos ícones (redondinho, quadradinho ou futurista), ponha papel de parede na tela inicial e nas conversas, veja os pacotes de emojis e use o teclado do Voxix, com LED colorido ao tocar." },
+  { id: 8, data: "2026-11-14", tipo: "correcao", titulo: "Procurar atualizações", texto: "Agora o app diz “Você já está na versão mais nova” quando não há nada novo, e só fala em falta de conexão quando realmente não consegue falar com a internet." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

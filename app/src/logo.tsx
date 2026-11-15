@@ -3,10 +3,15 @@ import { useVisual } from "./useVisual";
 
 /** Desenho oficial do Voxix: V com X no meio, em roxo escuro com contorno vermelho brilhante (igual ao conceito visual). */
 function Defs({ id }: { id: string }) {
+  // as cores vêm das variáveis do tema (--color-neon e --color-magenta): trocou a cor do app, trocou o emblema
   return (
     <defs>
-      <linearGradient id={`g${id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7c2fd6" /><stop offset=".55" stopColor="#4a1590" /><stop offset="1" stopColor="#2a0b4d" /></linearGradient>
-      <filter id={`b${id}`} x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#ff1f35" floodOpacity=".85" /></filter>
+      <linearGradient id={`g${id}`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style={{ stopColor: "color-mix(in srgb, var(--color-magenta) 88%, #fff)" }} />
+        <stop offset=".55" style={{ stopColor: "color-mix(in srgb, var(--color-magenta) 50%, #000)" }} />
+        <stop offset="1" style={{ stopColor: "color-mix(in srgb, var(--color-magenta) 28%, #000)" }} />
+      </linearGradient>
+      <filter id={`b${id}`} x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="3" style={{ floodColor: "var(--color-neon)" }} floodOpacity=".85" /></filter>
     </defs>
   );
 }
@@ -18,9 +23,9 @@ const NOME = "M0 0 L12 0 L22 28 L32 0 L44 0 L28 40 L16 40 Z M60 0 L88 0 L96 8 L9
 function Desenho({ id }: { id: string }) {
   return (
     <g>
-      <path d={MARCA} fill={`url(#g${id})`} stroke="#ff2d3d" strokeWidth="3.2" strokeLinejoin="round" filter={`url(#b${id})`} />
-      <path d={X} stroke="#ff2d3d" strokeWidth="11" strokeLinecap="square" fill="none" />
-      <path d={X} stroke="#2a0b4d" strokeWidth="5.5" strokeLinecap="square" fill="none" />
+      <path d={MARCA} fill={`url(#g${id})`} style={{ stroke: "var(--color-neon)" }} strokeWidth="3" strokeLinejoin="round" filter={`url(#b${id})`} />
+      <path d={X} style={{ stroke: "var(--color-neon)" }} strokeWidth="11" strokeLinecap="square" fill="none" />
+      <path d={X} style={{ stroke: "color-mix(in srgb, var(--color-magenta) 28%, #000)" }} strokeWidth="5.5" strokeLinecap="square" fill="none" />
     </g>
   );
 }
@@ -42,7 +47,7 @@ export function NomeVoxix({ largura = 200, className = "" }: { largura?: number;
   return (
     <svg viewBox="-8 -8 236 56" width={largura} height={(largura * 56) / 236} className={className} role="img" aria-label="Voxix">
       <Defs id={id} />
-      <path d={NOME} fill={`url(#g${id})`} stroke="#ff2d3d" strokeWidth="2.4" strokeLinejoin="round" fillRule="evenodd" filter={`url(#b${id})`} />
+      <path d={NOME} fill={`url(#g${id})`} style={{ stroke: "var(--color-neon)" }} strokeWidth="2.4" strokeLinejoin="round" fillRule="evenodd" filter={`url(#b${id})`} />
     </svg>
   );
 }

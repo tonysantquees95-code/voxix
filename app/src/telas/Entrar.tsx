@@ -30,7 +30,7 @@ export function Entrar() {
         <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="E-mail" className="w-full rounded-xl border border-borda bg-painel px-4 py-3 outline-none focus:border-neon" />
         <input type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} placeholder="Senha" className="w-full rounded-xl border border-borda bg-painel px-4 py-3 outline-none focus:border-neon" />
         {erro && <p className="text-sm text-erro" role="alert">{erro}</p>}
-        <button disabled={ocupado} className="w-full rounded-xl bg-neon py-3 font-extrabold text-[#04121c] disabled:opacity-60">{ocupado ? "Entrando…" : "Entrar"}</button>
+        <button disabled={ocupado} className="w-full rounded-xl bg-neon py-3 font-extrabold text-white disabled:opacity-60">{ocupado ? "Entrando…" : "Entrar"}</button>
         <p className="text-center text-sm text-suave">Ainda não tem conta? <button type="button" onClick={() => abrirLink(SITE_DA_CONTA)} className="text-neon underline">Criar o Vetorial ID</button></p>
       </form>
     </div>

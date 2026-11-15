@@ -60,7 +60,7 @@ export function Conversa({ apelido }: { apelido: string }) {
     <>
       <header className="flex items-center gap-3 border-b border-borda bg-painel px-3 py-2.5">
         <button onClick={() => abrir(null)} aria-label="Voltar" className="grid h-9 w-9 place-items-center rounded-full text-xl md:hidden">←</button>
-        <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-gradient-to-br from-neon to-magenta font-extrabold text-[#04121c]">{conversa.nome.slice(0, 1).toUpperCase()}</span>
+        <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{conversa.nome.slice(0, 1).toUpperCase()}</span>
         <div className="min-w-0 flex-1"><div className="truncate font-bold leading-tight">{conversa.nome}</div><div className="text-xs text-suave">@{conversa.apelido}</div></div>
         <div className="relative">
           <button onClick={() => setMenu((m) => !m)} aria-label="Mais opções" className="grid h-9 w-9 place-items-center rounded-full text-xl">⋮</button>
@@ -80,7 +80,7 @@ export function Conversa({ apelido }: { apelido: string }) {
           <div key={m.id} className={`flex ${m.minha ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[80%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2 text-[15px] ${m.minha ? "balao-meu rounded-br-md" : "rounded-bl-md border border-borda bg-painel"}`}>
               {m.corpo}
-              <div className={`mt-0.5 text-right text-[10px] ${m.minha ? "text-[#04121c]/70" : "text-suave"}`}>
+              <div className={`mt-0.5 text-right text-[10px] ${m.minha ? "text-white/70" : "text-suave"}`}>
                 {horaMsg(m.criado)}{m.minha && (m.estado === "enviando" ? " · enviando…" : m.estado === "enviada" ? " ✓" : "")}
                 {m.estado === "falhou" && <button onClick={() => void reenviar(apelido, m.id, m.corpo).catch(() => setAviso("Ainda não consegui enviar."))} className="ml-1 font-bold underline">não enviada · tentar de novo</button>}
               </div>
@@ -94,7 +94,7 @@ export function Conversa({ apelido }: { apelido: string }) {
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="flex items-end gap-2 border-t border-borda bg-painel p-2.5">
         <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`grid h-11 w-11 flex-none place-items-center rounded-full border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}>🎤</button>
         <textarea value={texto} onChange={(e) => setTexto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); } }} rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-borda bg-fundo px-4 py-2.5 outline-none focus:border-neon" />
-        <button disabled={!texto.trim()} className="grid h-11 w-11 flex-none place-items-center rounded-full bg-neon text-lg font-bold text-[#04121c] disabled:opacity-40" aria-label="Enviar">➤</button>
+        <button disabled={!texto.trim()} className="grid h-11 w-11 flex-none place-items-center rounded-full bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar">➤</button>
       </form>
 
       {denuncia && sessao && <Denuncia apelido={apelido} trecho={mensagens.filter((m) => !m.minha).slice(-10).map((m) => m.corpo).join("\n")} token={sessao.token} fechar={() => setDenuncia(false)} aoEnviar={() => setAviso("Denúncia enviada. Obrigado por avisar.")} />}

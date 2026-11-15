@@ -47,7 +47,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
           <p className="mt-1 text-sm">Versão instalada: {BUILD > 0 ? `1.${BUILD}` : "desenvolvimento"}</p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <button onClick={() => void procurar()} className="rounded-xl border border-borda px-4 py-2 text-sm">Procurar atualizações</button>
-            {novaVersao && <button onClick={() => abrirLink(enderecoDoDownload())} className="rounded-xl bg-neon px-4 py-2 text-sm font-bold text-[#04121c]">Baixar</button>}
+            {novaVersao && <button onClick={() => abrirLink(enderecoDoDownload())} className="rounded-xl bg-neon px-4 py-2 text-sm font-bold text-white">Baixar</button>}
           </div>
           {versao && <p className="mt-1 text-xs text-suave" role="status">{versao}</p>}
         </section>

@@ -18,7 +18,7 @@ export function Novidades({ itens, aoFechar }: { itens: Novidade[]; aoFechar: ()
             </li>
           ))}
         </ul>
-        <button onClick={fechar} className="rounded-xl bg-neon py-3 font-extrabold text-[#04121c]">Entendi</button>
+        <button onClick={fechar} className="rounded-xl bg-neon py-3 font-extrabold text-white">Entendi</button>
       </div>
     </div>
   );

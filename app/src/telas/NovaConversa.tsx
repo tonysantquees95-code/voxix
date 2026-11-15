@@ -29,7 +29,7 @@ export function NovaConversa({ fechar }: { fechar: () => void }) {
         {erro && <p className="text-sm text-erro" role="alert">{erro}</p>}
         <div className="flex gap-2">
           <button type="button" onClick={fechar} className="flex-1 rounded-xl border border-borda py-2.5">Cancelar</button>
-          <button disabled={ocupado || apelido.replace("@", "").length < 3} className="flex-1 rounded-xl bg-neon py-2.5 font-extrabold text-[#04121c] disabled:opacity-60">{ocupado ? "Procurando…" : "Procurar"}</button>
+          <button disabled={ocupado || apelido.replace("@", "").length < 3} className="flex-1 rounded-xl bg-neon py-2.5 font-extrabold text-white disabled:opacity-60">{ocupado ? "Procurando…" : "Procurar"}</button>
         </div>
       </form>
     </div>

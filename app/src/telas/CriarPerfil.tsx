@@ -32,7 +32,7 @@ export function CriarPerfil({ aoCriar }: { aoCriar: () => void }) {
         <input maxLength={40} value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome para mostrar (opcional)" className="w-full rounded-xl border border-borda bg-painel px-4 py-3 outline-none focus:border-neon" />
         <p className="text-xs text-suave">3 a 20 letras minúsculas, números ou _ (sem espaço nem acento).</p>
         {erro && <p className="text-sm text-erro" role="alert">{erro}</p>}
-        <button disabled={ocupado || apelido.length < 3} className="w-full rounded-xl bg-neon py-3 font-extrabold text-[#04121c] disabled:opacity-60">{ocupado ? "Salvando…" : "Continuar"}</button>
+        <button disabled={ocupado || apelido.length < 3} className="w-full rounded-xl bg-neon py-3 font-extrabold text-white disabled:opacity-60">{ocupado ? "Salvando…" : "Continuar"}</button>
         <button type="button" onClick={() => void sair()} className="w-full text-sm text-suave underline">Sair da conta</button>
       </form>
     </div>

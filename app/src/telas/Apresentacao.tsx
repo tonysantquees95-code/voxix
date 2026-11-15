@@ -39,7 +39,7 @@ export function Tour({ aoTerminar, rotuloFinal = "Continuar", aoFechar }: { aoTe
       <div className="mb-4 flex justify-center gap-2" aria-label={`Tela ${i + 1} de ${TOUR.length}`}>{TOUR.map((_, k) => <span key={k} className={`h-1.5 rounded-full transition-all ${k === i ? "w-8 bg-neon" : "w-3 bg-white/20"}`} />)}</div>
       <div className="flex gap-3">
         <button disabled={i === 0} onClick={() => ir(-1)} className="rounded-xl border border-borda px-5 py-3 disabled:opacity-30">‹ Voltar</button>
-        <button onClick={() => (ultimo ? aoTerminar() : ir(1))} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-[#04121c]">{ultimo ? rotuloFinal : "Próximo ›"}</button>
+        <button onClick={() => (ultimo ? aoTerminar() : ir(1))} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-white">{ultimo ? rotuloFinal : "Próximo ›"}</button>
       </div>
     </div>
   );
@@ -65,7 +65,7 @@ function Permissoes({ aoVoltar, aoContinuar }: { aoVoltar: () => void; aoContinu
       </ul>
       <div className="flex gap-3">
         <button onClick={aoVoltar} className="rounded-xl border border-borda px-5 py-3">‹ Voltar</button>
-        <button onClick={aoContinuar} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-[#04121c]">Continuar</button>
+        <button onClick={aoContinuar} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-white">Continuar</button>
       </div>
     </div>
   );
@@ -82,13 +82,13 @@ export function Termos({ aoAceitar, aoVoltar, aoFechar }: { aoAceitar?: () => vo
       </div>
       {aoAceitar ? (
         <>
-          <label className="flex cursor-pointer items-center gap-3 text-sm"><input type="checkbox" className="size-5 accent-cyan-300" checked={ok} onChange={(e) => setOk(e.target.checked)} />Li e aceito os termos de uso do Voxix.</label>
+          <label className="flex cursor-pointer items-center gap-3 text-sm"><input type="checkbox" className="size-5 accent-neon" checked={ok} onChange={(e) => setOk(e.target.checked)} />Li e aceito os termos de uso do Voxix.</label>
           <div className="flex gap-3">
             {aoVoltar && <button onClick={aoVoltar} className="rounded-xl border border-borda px-5 py-3">‹ Voltar</button>}
-            <button disabled={!ok} onClick={aoAceitar} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-[#04121c] disabled:opacity-40">Aceitar e continuar</button>
+            <button disabled={!ok} onClick={aoAceitar} className="flex-1 rounded-xl bg-neon py-3 font-extrabold text-white disabled:opacity-40">Aceitar e continuar</button>
           </div>
         </>
-      ) : <button onClick={aoFechar} className="rounded-xl bg-neon py-3 font-extrabold text-[#04121c]">Fechar</button>}
+      ) : <button onClick={aoFechar} className="rounded-xl bg-neon py-3 font-extrabold text-white">Fechar</button>}
     </div>
   );
 }

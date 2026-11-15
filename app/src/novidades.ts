@@ -8,6 +8,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 1, data: "2026-11-14", tipo: "novo", titulo: "Voxix chegou", texto: "Conversas privadas ao vivo com o apelido dos seus amigos, bloqueio, denúncia e ditado por microfone." },
   { id: 2, data: "2026-11-14", tipo: "correcao", titulo: "Tela entre as barras do Android", texto: "No Android, o Voxix agora fica entre a barra de cima e os botões de navegação, sem passar por baixo deles, mesmo quando as barras estão fixas. Os botões de baixo e o campo de mensagem não ficam mais escondidos." },
   { id: 3, data: "2026-11-14", tipo: "melhoria", titulo: "Logo novo do Voxix", texto: "O Voxix ganhou a identidade nova: o V com X em roxo escuro com contorno vermelho brilhante, o nome VOXIX em letras angulares e o selo Gaming Chat. Aparece na tela de entrada, no ícone do app e na abertura." },
+  { id: 4, data: "2026-11-14", tipo: "melhoria", titulo: "Cores novas", texto: "O Voxix inteiro agora usa as cores do logo: vermelho brilhante e roxo escuro, nos botões, nas mensagens, nos destaques e nas telas." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

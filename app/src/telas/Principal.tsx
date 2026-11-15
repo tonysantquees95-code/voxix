@@ -28,7 +28,7 @@ export function Principal() {
             <div className="font-extrabold leading-tight">Voxix{naoLidas > 0 && <span className="ml-2 rounded-full bg-magenta px-2 py-0.5 text-xs text-[#1a0620]">{naoLidas}</span>}</div>
             <div className="truncate text-xs text-suave">@{perfil?.apelido} · <span className={conexao === "conectado" ? "text-ok" : conexao === "conectando" ? "text-aviso" : "text-erro"}>{conexao === "conectado" ? "ao vivo" : conexao === "conectando" ? "conectando…" : "sem conexão"}</span></div>
           </div>
-          <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="grid h-9 w-9 place-items-center rounded-full bg-neon text-xl font-bold text-[#04121c]">+</button>
+          <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="grid h-9 w-9 place-items-center rounded-full bg-neon text-xl font-bold text-white">+</button>
           <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="grid h-9 w-9 place-items-center rounded-full border border-borda text-lg">⚙</button>
         </header>
         <Aviso />
@@ -38,7 +38,7 @@ export function Principal() {
             const ult = c.mensagens[c.mensagens.length - 1];
             return (
               <button key={c.apelido} onClick={() => abrir(c.apelido)} className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${aberta === c.apelido ? "bg-white/10" : ""}`}>
-                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-gradient-to-br from-neon to-magenta font-extrabold text-[#04121c]">{c.nome.slice(0, 1).toUpperCase()}</span>
+                <span className="grid h-11 w-11 flex-none place-items-center rounded-full bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{c.nome.slice(0, 1).toUpperCase()}</span>
                 <span className="min-w-0 flex-1">
                   <span className="flex justify-between gap-2"><b className="truncate">{c.nome}</b><span className="flex-none text-xs text-suave">{ult ? hora(ult.criado) : ""}</span></span>
                   <span className="flex justify-between gap-2"><span className="truncate text-sm text-suave">{ult ? `${ult.minha ? "Você: " : ""}${ult.corpo}` : "Diga oi!"}</span>{c.naoLidas > 0 && <span className="flex-none rounded-full bg-magenta px-2 text-xs font-bold text-[#1a0620]">{c.naoLidas}</span>}</span>

@@ -4,6 +4,7 @@ import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atua
 import { useVoxix } from "../estado";
 import { abrirLink } from "../link";
 import { LogoTempestade } from "../logo";
+import { Icone } from "../icones";
 import { Personalizar } from "./Personalizar";
 import { NOVIDADES } from "../novidades";
 import { Novidades } from "./Novidades";
@@ -42,14 +43,14 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   return (
     <div className="fixed inset-0 z-10 grid place-items-center bg-black/70 p-4" onClick={fechar}>
       <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-full w-full max-w-sm space-y-4 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
-        <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">Ajustes</h2><button onClick={fechar} aria-label="Fechar" className="text-xl text-suave">✕</button></div>
+        <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">Ajustes</h2><button onClick={fechar} aria-label="Fechar" className="text-xl text-suave"><Icone nome="fechar" tam={22} /></button></div>
         <section><h3 className="text-sm font-bold text-suave">Conta</h3><p className="mt-1">@{perfil?.apelido} · {perfil?.nome}</p><p className="text-xs text-suave">{sessao?.email}</p></section>
         <section>
           <h3 className="text-sm font-bold text-suave">Personalizar</h3>
           <button onClick={() => setPersonalizando(true)} className="mt-2 flex w-full items-center gap-3 rounded-xl border border-borda px-4 py-3 text-left">
             <LogoTempestade tam={40} />
             <span className="min-w-0 flex-1"><b className="block">Cores, formato, fundo e teclado</b><span className="block text-xs text-suave">Cor com RGB, formato dos ícones, papel de parede, emojis e o teclado do Voxix.</span></span>
-            <span className="text-suave">›</span>
+            <span className="text-suave"><Icone nome="seta" tam={18} /></span>
           </button>
         </section>
         <section>

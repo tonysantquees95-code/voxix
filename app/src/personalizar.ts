@@ -48,6 +48,25 @@ export interface Teclado {
 }
 export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "led", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media" };
 
+/** Desenho dos ícones do app (engrenagem, enviar, microfone…): espessura do traço, tamanho, estilo e cor. */
+export type Traco = "fino" | "medio" | "grosso";
+export type TamanhoIcone = "pequeno" | "medio" | "grande";
+export type EstiloIcone = "contorno" | "suave";
+export type CorIcone = "texto" | "app";
+export interface Icones { traco: Traco; tamanho: TamanhoIcone; estilo: EstiloIcone; cor: CorIcone }
+export const TRACOS: Record<Traco, number> = { fino: 1.4, medio: 2, grosso: 2.8 };
+export const ESCALAS_ICONE: Record<TamanhoIcone, number> = { pequeno: 0.85, medio: 1, grande: 1.25 };
+export const ICONES_PADRAO: Icones = { traco: "medio", tamanho: "medio", estilo: "contorno", cor: "texto" };
+export function limparIcones(v: unknown): Icones {
+  const o = obj(v);
+  return {
+    traco: um(["fino", "medio", "grosso"] as const, o.traco, ICONES_PADRAO.traco),
+    tamanho: um(["pequeno", "medio", "grande"] as const, o.tamanho, ICONES_PADRAO.tamanho),
+    estilo: um(["contorno", "suave"] as const, o.estilo, ICONES_PADRAO.estilo),
+    cor: um(["texto", "app"] as const, o.cor, ICONES_PADRAO.cor),
+  };
+}
+
 export interface Visual {
   cor: string;              // id de um tema pronto ou "#rrggbb" escolhido no RGB
   tempestade: boolean;
@@ -56,11 +75,12 @@ export interface Visual {
   papelInicio: Papel;
   papelConversa: Papel;
   teclado: Teclado;
+  icones: Icones;
   pacoteEmoji: string;      // pacote aberto por último no teclado
 }
 export const VISUAL_PADRAO: Visual = {
   cor: "voxix", tempestade: true, forca: "media", formato: "redondo",
-  papelInicio: PAPEL_PADRAO, papelConversa: PAPEL_PADRAO, teclado: TECLADO_PADRAO, pacoteEmoji: "recentes",
+  papelInicio: PAPEL_PADRAO, papelConversa: PAPEL_PADRAO, teclado: TECLADO_PADRAO, icones: ICONES_PADRAO, pacoteEmoji: "recentes",
 };
 
 export const hexValido = (h: unknown): h is string => typeof h === "string" && /^#[0-9a-f]{6}$/i.test(h);
@@ -102,6 +122,7 @@ export function limparVisual(v: unknown): Visual {
     papelInicio: limparPapel(o.papelInicio),
     papelConversa: limparPapel(o.papelConversa),
     teclado: limparTeclado(o.teclado),
+    icones: limparIcones(o.icones),
     pacoteEmoji: typeof o.pacoteEmoji === "string" && /^[a-z]{3,20}$/.test(o.pacoteEmoji) ? o.pacoteEmoji : VISUAL_PADRAO.pacoteEmoji,
   };
 }
@@ -166,4 +187,5 @@ export function mudarVisual(parcial: Partial<Visual>) {
 export const mudarTeclado = (p: Partial<Teclado>) => mudarVisual({ teclado: { ...atual.teclado, ...p } });
 export const mudarPapel = (qual: "papelInicio" | "papelConversa", p: Partial<Papel>) =>
   mudarVisual(qual === "papelInicio" ? { papelInicio: { ...atual.papelInicio, ...p } } : { papelConversa: { ...atual.papelConversa, ...p } });
+export const mudarIcones = (p: Partial<Icones>) => mudarVisual({ icones: { ...atual.icones, ...p } });
 export function restaurarVisual() { mudarVisual({ ...VISUAL_PADRAO }); }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { Icone } from "./icones";
 import { PACOTES, RECENTES_ID, guardarRecentes, lerRecentes, somarRecente } from "./emojis";
 import { mudarVisual } from "./personalizar";
 import { ACENTOS, LETRAS, NUMEROS, TECLADO_ALTURA } from "./edicaoTeclado";
@@ -124,8 +125,8 @@ export function Teclado({ aoInserir, aoApagar, aoEnviar, inicioDeFrase, podeEnvi
           <div className="linha-tecla">
             <Tecla acender={acender} rotulo="Voltar para as letras" onPress={() => setPagina("letras")} larga={1.6} classe="tecla-fn">ABC</Tecla>
             <Tecla acender={acender} rotulo="Espaço" onPress={() => aoInserir(" ")} larga={5}>espaço</Tecla>
-            <Tecla acender={acender} rotulo="Apagar" onPress={aoApagar} repetir larga={1.6} classe="tecla-fn">⌫</Tecla>
-            <Tecla acender={acender} rotulo="Enviar" onPress={() => { if (podeEnviar) aoEnviar(); }} larga={1.6} classe={`tecla-enviar ${podeEnviar ? "" : "opacity-50"}`}>➤</Tecla>
+            <Tecla acender={acender} rotulo="Apagar" onPress={aoApagar} repetir larga={1.6} classe="tecla-fn"><Icone nome="apagar" tam={22} /></Tecla>
+            <Tecla acender={acender} rotulo="Enviar" onPress={() => { if (podeEnviar) aoEnviar(); }} larga={1.6} classe={`tecla-enviar ${podeEnviar ? "" : "opacity-50"}`}><Icone nome="enviar" tam={22} /></Tecla>
           </div>
         </>
       ) : (
@@ -133,13 +134,13 @@ export function Teclado({ aoInserir, aoApagar, aoEnviar, inicioDeFrase, podeEnvi
           {popup && (
             <div className="popup-acento" role="menu" aria-label={`Variações de ${popup.letra}`}>
               {popup.opcoes.map((o) => <button key={o} type="button" role="menuitem" onPointerDown={(e) => { e.preventDefault(); digitar(o); setPopup(null); }}>{o}</button>)}
-              <button type="button" aria-label="Fechar" onPointerDown={(e) => { e.preventDefault(); setPopup(null); }}>✕</button>
+              <button type="button" aria-label="Fechar" onPointerDown={(e) => { e.preventDefault(); setPopup(null); }}><Icone nome="fechar" tam={18} /></button>
             </div>
           )}
           {linhas.map((l, i) => (
             <div key={i} className="linha-tecla" style={i === 1 && pagina === "letras" ? { paddingInline: "4%" } : undefined}>
               {i === 2 && (
-                <Tecla acender={acender} rotulo="Maiúsculas" onPress={() => setShift((s) => (s === "nao" ? "uma" : s === "uma" ? "trava" : "nao"))} larga={1.5} ativa={shift !== "nao"} classe="tecla-fn">{shift === "trava" ? "⇪" : "⇧"}</Tecla>
+                <Tecla acender={acender} rotulo="Maiúsculas" onPress={() => setShift((s) => (s === "nao" ? "uma" : s === "uma" ? "trava" : "nao"))} larga={1.5} ativa={shift !== "nao"} classe="tecla-fn"><Icone nome={shift === "trava" ? "shiftTrava" : "shift"} tam={22} /></Tecla>
               )}
               {l.map((ch) => (
                 pagina === "letras" ? (
@@ -149,16 +150,16 @@ export function Teclado({ aoInserir, aoApagar, aoEnviar, inicioDeFrase, podeEnvi
                   </button>
                 ) : <Tecla key={ch} acender={acender} rotulo={ch} onPress={() => digitar(ch)}>{ch}</Tecla>
               ))}
-              {i === 2 && <Tecla acender={acender} rotulo="Apagar" onPress={aoApagar} repetir larga={1.5} classe="tecla-fn">⌫</Tecla>}
+              {i === 2 && <Tecla acender={acender} rotulo="Apagar" onPress={aoApagar} repetir larga={1.5} classe="tecla-fn"><Icone nome="apagar" tam={22} /></Tecla>}
             </div>
           ))}
           <div className="linha-tecla">
             <Tecla acender={acender} rotulo={pagina === "letras" ? "Números e símbolos" : "Letras"} onPress={() => setPagina(pagina === "letras" ? "numeros" : "letras")} larga={1.5} classe="tecla-fn">{pagina === "letras" ? "123" : "ABC"}</Tecla>
-            <Tecla acender={acender} rotulo="Emojis" onPress={() => setPagina("emojis")} larga={1.2} classe="tecla-fn">😀</Tecla>
+            <Tecla acender={acender} rotulo="Emojis" onPress={() => setPagina("emojis")} larga={1.2} classe="tecla-fn"><Icone nome="emoji" tam={22} /></Tecla>
             <Tecla acender={acender} rotulo="Vírgula" onPress={() => digitar(",")} larga={0.9}>,</Tecla>
             <Tecla acender={acender} rotulo="Espaço" onPress={() => aoInserir(" ")} larga={4}>espaço</Tecla>
             <Tecla acender={acender} rotulo="Ponto" onPress={() => digitar(".")} larga={0.9}>.</Tecla>
-            <Tecla acender={acender} rotulo="Enviar" onPress={() => { if (podeEnviar) aoEnviar(); }} larga={1.5} classe={`tecla-enviar ${podeEnviar ? "" : "opacity-50"}`}>➤</Tecla>
+            <Tecla acender={acender} rotulo="Enviar" onPress={() => { if (podeEnviar) aoEnviar(); }} larga={1.5} classe={`tecla-enviar ${podeEnviar ? "" : "opacity-50"}`}><Icone nome="enviar" tam={22} /></Tecla>
           </div>
         </>
       )}

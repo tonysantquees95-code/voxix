@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { coresDe, girarMatiz, hexDe, hexValido, limparVisual, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
+import { ICONES_PADRAO, limparIcones, TRACOS, ESCALAS_ICONE, coresDe, girarMatiz, hexDe, hexValido, limparVisual, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
 
 test("limparVisual: lixo volta ao padrão e valores válidos passam", () => {
   assert.deepEqual(limparVisual(null), VISUAL_PADRAO);
@@ -50,4 +50,14 @@ test("girarMatiz e conversões de cor", () => {
   assert.deepEqual(rgbDe("#0a141e"), [10, 20, 30]);
   assert.equal(hexDe(10, 20, 30), "#0a141e");
   assert.equal(hexDe(300, -5, 7.4), "#ff0007");
+});
+
+test("ícones: espessura, tamanho, estilo e cor só aceitam valores conhecidos", () => {
+  assert.deepEqual(limparIcones(null), ICONES_PADRAO);
+  assert.deepEqual(limparIcones({ traco: "grosso", tamanho: "grande", estilo: "suave", cor: "app" }), { traco: "grosso", tamanho: "grande", estilo: "suave", cor: "app" });
+  assert.deepEqual(limparIcones({ traco: "enorme", tamanho: 3, estilo: "x", cor: null }), ICONES_PADRAO);
+  assert.equal(limparVisual({ icones: { traco: "fino" } }).icones.traco, "fino");
+  assert.deepEqual(limparVisual({}).icones, ICONES_PADRAO);
+  assert.ok(TRACOS.fino < TRACOS.medio && TRACOS.medio < TRACOS.grosso);
+  assert.ok(ESCALAS_ICONE.pequeno < ESCALAS_ICONE.medio && ESCALAS_ICONE.medio < ESCALAS_ICONE.grande);
 });

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { lista, totalNaoLidas } from "../armazem";
 import { BUILD, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
+import { Icone } from "../icones";
 import { Logo, LogoTempestade } from "../logo";
 import { PapelDeParede } from "../papel";
 import { Ajustes } from "./Ajustes";
@@ -30,8 +31,8 @@ export function Principal() {
             <div className="font-extrabold leading-tight">Voxix{naoLidas > 0 && <span className="ml-2 rounded-full bg-magenta px-2 py-0.5 text-xs text-[#1a0620]">{naoLidas}</span>}</div>
             <div className="truncate text-xs text-suave">@{perfil?.apelido} · <span className={conexao === "conectado" ? "text-ok" : conexao === "conectando" ? "text-aviso" : "text-erro"}>{conexao === "conectado" ? "ao vivo" : conexao === "conectando" ? "conectando…" : "sem conexão"}</span></div>
           </div>
-          <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="botao-redondo grid h-9 w-9 place-items-center bg-neon text-xl font-bold text-white">+</button>
-          <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="botao-redondo grid h-9 w-9 place-items-center border border-borda text-lg">⚙</button>
+          <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="botao-redondo grid h-9 w-9 place-items-center bg-neon text-xl font-bold text-white"><Icone nome="adicionar" tam={22} /></button>
+          <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="botao-redondo grid h-9 w-9 place-items-center border border-borda text-lg"><Icone nome="config" tam={20} /></button>
         </header>
         <div className="relative z-[1]"><Aviso /></div>
         <div className="rolagem relative z-[1] min-h-0 flex-1 overflow-y-auto">

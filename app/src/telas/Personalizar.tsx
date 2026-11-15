@@ -1,17 +1,19 @@
 import { useRef, useState, type ReactNode } from "react";
 import { PACOTES } from "../emojis";
+import { Icone, type NomeIcone } from "../icones";
 import { LogoTempestade } from "../logo";
 import { PapelDeParede, fotoDo, guardarFoto, reduzirImagem, useFoto, type Qual } from "../papel";
 import {
-  FORCAS, FORMATOS, MODELOS_PAPEL, TEMAS, coresDe, hexDe, hexValido, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
+  FORCAS, FORMATOS, MODELOS_PAPEL, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
   type CorLed, type EfeitoToque, type FormaTecla, type Formato, type ModeloPapel,
 } from "../personalizar";
 import { Teclado } from "../Teclado";
 import { useVisual } from "../useVisual";
 
-type Aba = "cores" | "formato" | "fundo" | "emojis" | "teclado";
-const ABAS: { id: Aba; nome: string; icone: string }[] = [
-  { id: "cores", nome: "Cores", icone: "🎨" }, { id: "formato", nome: "Formato", icone: "⬡" }, { id: "fundo", nome: "Fundo", icone: "🖼️" }, { id: "emojis", nome: "Emojis", icone: "😀" }, { id: "teclado", nome: "Teclado", icone: "⌨️" },
+type Aba = "cores" | "formato" | "icones" | "fundo" | "emojis" | "teclado";
+const ABAS: { id: Aba; nome: string; icone: NomeIcone }[] = [
+  { id: "cores", nome: "Cores", icone: "cores" }, { id: "formato", nome: "Formato", icone: "formato" }, { id: "icones", nome: "Ícones", icone: "estrela" },
+  { id: "fundo", nome: "Fundo", icone: "fundo" }, { id: "emojis", nome: "Emojis", icone: "emoji" }, { id: "teclado", nome: "Teclado", icone: "teclado" },
 ];
 
 function Chip({ ativo, onClick, children, rotulo, cheio }: { ativo: boolean; onClick: () => void; children: ReactNode; rotulo?: string; cheio?: boolean }) {
@@ -95,7 +97,7 @@ function AbaFormato() {
   const v = useVisual();
   return (
     <div className="space-y-3">
-      <p className="text-sm text-suave">Muda os avatares, balões de mensagem e botões do app inteiro.</p>
+      <p className="text-sm text-suave">Muda a forma dos avatares, dos balões de mensagem e dos botões redondos (+, enviar, microfone, ajustes). O desenho dos ícones você escolhe na aba <b>Ícones</b>.</p>
       <div className="grid gap-2" role="radiogroup" aria-label="Formato dos ícones">
         {FORMATOS.map((f) => (
           <button key={f.id} type="button" role="radio" aria-checked={v.formato === f.id} onClick={() => mudarVisual({ formato: f.id as Formato })} data-formato={f.id}
@@ -103,9 +105,58 @@ function AbaFormato() {
             <span className="avatar grid h-11 w-11 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">V</span>
             <span className="min-w-0 flex-1"><b className="block">{f.nome}</b><span className="block text-xs text-suave">{f.dica}</span></span>
             <span className="balao balao-meu px-3 py-1.5 text-xs">Oi!</span>
-            <span className="botao-redondo grid h-8 w-8 flex-none place-items-center bg-neon text-sm text-white">➤</span>
+            <span className="botao-redondo grid h-8 w-8 flex-none place-items-center bg-neon text-sm text-white"><Icone nome="enviar" tam={18} /></span>
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+const TODOS_ICONES: { nome: NomeIcone; rotulo: string }[] = [
+  { nome: "config", rotulo: "Ajustes" }, { nome: "adicionar", rotulo: "Nova conversa" }, { nome: "enviar", rotulo: "Enviar" }, { nome: "microfone", rotulo: "Microfone" },
+  { nome: "mais", rotulo: "Mais" }, { nome: "voltar", rotulo: "Voltar" }, { nome: "fechar", rotulo: "Fechar" }, { nome: "inicio", rotulo: "Início" },
+  { nome: "teclado", rotulo: "Teclado" }, { nome: "emoji", rotulo: "Emoji" }, { nome: "apagar", rotulo: "Apagar" }, { nome: "shift", rotulo: "Maiúscula" },
+];
+
+function AbaIcones() {
+  const v = useVisual();
+  const i = v.icones;
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-suave">Escolha como ficam os ícones do app: engrenagem, enviar, microfone, teclado e os outros.</p>
+      <div className="grid grid-cols-4 gap-2 rounded-xl border border-borda p-3" aria-label="Prévia dos ícones">
+        {TODOS_ICONES.map((t) => (
+          <div key={t.nome} className="flex flex-col items-center gap-1 py-1 text-center text-[10px] text-suave">
+            <span className="grid h-11 w-11 place-items-center text-texto"><Icone nome={t.nome} tam={28} /></span>{t.rotulo}
+          </div>
+        ))}
+      </div>
+      <div>
+        <p className="mb-1 text-xs text-suave">Espessura do traço</p>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Espessura">
+          {([["fino", "Fino"], ["medio", "Médio"], ["grosso", "Grosso"]] as const).map(([id, nome]) => <Chip key={id} cheio ativo={i.traco === id} onClick={() => mudarIcones({ traco: id })}>{nome}</Chip>)}
+        </div>
+      </div>
+      <div>
+        <p className="mb-1 text-xs text-suave">Tamanho</p>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Tamanho">
+          {([["pequeno", "Pequeno"], ["medio", "Médio"], ["grande", "Grande"]] as const).map(([id, nome]) => <Chip key={id} cheio ativo={i.tamanho === id} onClick={() => mudarIcones({ tamanho: id })}>{nome}</Chip>)}
+        </div>
+      </div>
+      <div>
+        <p className="mb-1 text-xs text-suave">Estilo</p>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Estilo">
+          <Chip cheio ativo={i.estilo === "contorno"} onClick={() => mudarIcones({ estilo: "contorno" })}>Só contorno</Chip>
+          <Chip cheio ativo={i.estilo === "suave"} onClick={() => mudarIcones({ estilo: "suave" })}>Com preenchimento</Chip>
+        </div>
+      </div>
+      <div>
+        <p className="mb-1 text-xs text-suave">Cor</p>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Cor dos ícones">
+          <Chip cheio ativo={i.cor === "texto"} onClick={() => mudarIcones({ cor: "texto" })}>Neutra</Chip>
+          <Chip cheio ativo={i.cor === "app"} onClick={() => mudarIcones({ cor: "app" })}>Cor do app</Chip>
+        </div>
       </div>
     </div>
   );
@@ -237,16 +288,16 @@ export function Personalizar({ fechar, irParaInicio }: { fechar: () => void; irP
   return (
     <div className="fixed inset-0 z-20 flex flex-col bg-fundo" role="dialog" aria-label="Personalizar o Voxix" onClick={(e) => e.stopPropagation()}>
       <header className="flex flex-none items-center gap-2 border-b border-borda bg-painel px-3 py-2">
-        <button onClick={fechar} aria-label="Voltar aos ajustes" className="rounded-xl border border-borda px-3 py-2 text-sm">‹ Voltar</button>
+        <button onClick={fechar} aria-label="Voltar aos ajustes" className="rounded-xl border border-borda px-3 py-2 text-sm"><span className="inline-flex items-center gap-1"><Icone nome="voltar" tam={16} /> Voltar</span></button>
         <h2 className="min-w-0 flex-1 truncate text-center text-lg font-extrabold">Personalizar</h2>
-        <button onClick={irParaInicio} aria-label="Ir para o início" className="rounded-xl bg-neon px-3 py-2 text-sm font-bold text-white">🏠 Início</button>
+        <button onClick={irParaInicio} aria-label="Ir para o início" className="rounded-xl bg-neon px-3 py-2 text-sm font-bold text-white"><span className="inline-flex items-center gap-1.5"><Icone nome="inicio" tam={16} /> Início</span></button>
       </header>
       <div className="flex flex-none justify-center bg-painel/60 py-3"><LogoTempestade tam={56} /></div>
-      <nav className="grid flex-none grid-cols-5 gap-1 border-b border-borda bg-painel px-2 pb-2" role="tablist" aria-label="Seções">
+      <nav className="grid flex-none grid-cols-6 gap-1 border-b border-borda bg-painel px-2 pb-2" role="tablist" aria-label="Seções">
         {ABAS.map((a) => (
           <button key={a.id} type="button" role="tab" aria-selected={aba === a.id} onClick={() => setAba(a.id)}
-            className={`flex flex-col items-center gap-0.5 rounded-xl border px-1 py-1.5 text-xs ${aba === a.id ? "border-neon bg-neon/15 font-bold text-texto" : "border-transparent text-suave"}`}>
-            <span className="text-lg leading-none" aria-hidden="true">{a.icone}</span>{a.nome}
+            className={`flex flex-col items-center gap-0.5 rounded-xl border px-0.5 py-1.5 text-[11px] ${aba === a.id ? "border-neon bg-neon/15 font-bold text-texto" : "border-transparent text-suave"}`}>
+            <Icone nome={a.icone} tam={22} />{a.nome}
           </button>
         ))}
       </nav>
@@ -254,6 +305,7 @@ export function Personalizar({ fechar, irParaInicio }: { fechar: () => void; irP
         <div className="mx-auto w-full max-w-xl px-4 py-4">
           {aba === "cores" && <AbaCores />}
           {aba === "formato" && <AbaFormato />}
+          {aba === "icones" && <AbaIcones />}
           {aba === "fundo" && <AbaFundo />}
           {aba === "emojis" && <AbaEmojis />}
           {aba === "teclado" && <AbaTeclado />}

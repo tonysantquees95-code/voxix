@@ -1,3 +1,4 @@
+import { Icone } from "../icones";
 import { useRef, useState } from "react";
 import { aceitarTermos, marcarTourVisto, TERMOS, TOUR } from "../apresentacao";
 import { marcarVisto, ultimoId } from "../novidades";
@@ -29,7 +30,7 @@ export function Tour({ aoTerminar, rotuloFinal = "Continuar", aoFechar }: { aoTe
   const ir = (d: number) => setI((x) => Math.max(0, Math.min(TOUR.length - 1, x + d)));
   return (
     <div className="flex min-h-0 flex-1 flex-col" onTouchStart={(e) => { inicio.current = e.touches[0]!.clientX; }} onTouchEnd={(e) => { if (inicio.current === null) return; const dx = e.changedTouches[0]!.clientX - inicio.current; inicio.current = null; if (Math.abs(dx) > 60) ir(dx < 0 ? 1 : -1); }}>
-      <div className="flex items-center justify-between"><Logo tam={32} />{aoFechar ? <button onClick={aoFechar} aria-label="Fechar" className="text-xl text-suave">✕</button> : <button onClick={aoTerminar} className="text-sm text-suave underline">Pular</button>}</div>
+      <div className="flex items-center justify-between"><Logo tam={32} />{aoFechar ? <button onClick={aoFechar} aria-label="Fechar" className="text-suave"><Icone nome="fechar" tam={24} /></button> : <button onClick={aoTerminar} className="text-sm text-suave underline">Pular</button>}</div>
       <div className="rolagem flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto text-center">
         <div className="grid h-24 w-24 place-items-center rounded-3xl border border-borda bg-painel text-5xl shadow-[0_0_40px_-10px_var(--color-neon)]" aria-hidden>{p.icone}</div>
         <h1 className="text-2xl font-extrabold">{p.titulo}</h1>

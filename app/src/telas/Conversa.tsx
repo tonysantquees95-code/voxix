@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ErroApi } from "../api";
 import { iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
+import { Icone } from "../icones";
 import { PapelDeParede } from "../papel";
 import { Teclado } from "../Teclado";
 import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../edicaoTeclado";
@@ -77,11 +78,11 @@ export function Conversa({ apelido }: { apelido: string }) {
   return (
     <>
       <header className="flex items-center gap-3 border-b border-borda bg-painel px-3 py-2.5">
-        <button onClick={() => abrir(null)} aria-label="Voltar" className="grid h-9 w-9 place-items-center rounded-full text-xl md:hidden">←</button>
+        <button onClick={() => abrir(null)} aria-label="Voltar" className="grid h-9 w-9 place-items-center rounded-full text-xl md:hidden"><Icone nome="voltar" tam={22} /></button>
         <span className="avatar grid h-10 w-10 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{conversa.nome.slice(0, 1).toUpperCase()}</span>
         <div className="min-w-0 flex-1"><div className="truncate font-bold leading-tight">{conversa.nome}</div><div className="text-xs text-suave">@{conversa.apelido}</div></div>
         <div className="relative">
-          <button onClick={() => setMenu((m) => !m)} aria-label="Mais opções" className="grid h-9 w-9 place-items-center rounded-full text-xl">⋮</button>
+          <button onClick={() => setMenu((m) => !m)} aria-label="Mais opções" className="grid h-9 w-9 place-items-center rounded-full text-xl"><Icone nome="mais" tam={22} /></button>
           {menu && (
             <div className="absolute right-0 top-10 z-10 w-52 overflow-hidden rounded-xl border border-borda bg-painel text-sm shadow-xl">
               <button onClick={() => void bloquear()} className="block w-full px-4 py-3 text-left hover:bg-white/5">Bloquear</button>
@@ -111,13 +112,13 @@ export function Conversa({ apelido }: { apelido: string }) {
 
       {aviso && <p className="px-4 pb-1 text-xs text-aviso" role="status">{aviso}</p>}
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="flex items-end gap-2 border-t border-borda bg-painel p-2.5">
-        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}>🎤</button>
+        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome="microfone" tam={22} /></button>
         <textarea ref={caixa} inputMode={proprio ? "none" : undefined} onFocus={() => setTecladoAberto(true)} onClick={() => setTecladoAberto(true)} value={texto} onChange={(e) => setTexto(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); } }} rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} className="max-h-32 balao min-h-11 flex-1 resize-none border border-borda bg-fundo px-4 py-2.5 outline-none focus:border-neon" />
-        <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar">➤</button>
+        <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar"><Icone nome="enviar" tam={22} /></button>
       </form>
       {proprio && tecladoAberto && (
         <>
-          <button type="button" onClick={() => { setTecladoAberto(false); caixa.current?.blur(); }} className="w-full border-t border-borda bg-painel py-1 text-xs text-suave" aria-label="Fechar o teclado">⌄ fechar teclado</button>
+          <button type="button" onClick={() => { setTecladoAberto(false); caixa.current?.blur(); }} className="w-full border-t border-borda bg-painel py-1 text-xs text-suave" aria-label="Fechar o teclado"><span className="inline-flex items-center gap-1"><Icone nome="teclado" tam={14} /> fechar teclado</span></button>
           <Teclado aoInserir={(x) => editar((t, i, j) => inserir(t, i, j, x))} aoApagar={() => editar(apagarTexto)} aoEnviar={() => void mandar()} inicioDeFrase={comecaFrase(texto, posCursor())} podeEnviar={!!texto.trim()} />
         </>
       )}

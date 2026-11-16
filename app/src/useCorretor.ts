@@ -8,7 +8,7 @@ let carregando: Promise<void> | null = null;
 
 export function carregarDicionario(): Promise<void> {
   carregando ??= import("./ptbr-palavras.txt?raw")
-    .then((m) => { dicionario = criarDicionario(m.default.split("\n").filter(Boolean)); })
+    .then((m) => { dicionario = criarDicionario(m.default.split(/\r?\n/).map((p) => p.trim()).filter(Boolean)); })
     .catch(() => { carregando = null; }); // sem dicionário o corretor só fica desligado
   return carregando;
 }

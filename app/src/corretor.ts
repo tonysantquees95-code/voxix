@@ -19,7 +19,8 @@ export function criarDicionario(palavras: readonly string[]): Dicionario {
   const rank = new Map<string, number>();
   const porChave = new Map<string, string[]>();
   const porPrefixo = new Map<string, { palavras: string[]; chaves: string[] }>();
-  palavras.forEach((p, i) => {
+  palavras.forEach((bruta, i) => {
+    const p = bruta.trim(); // o arquivo pode chegar com fim de linha do Windows (\r\n): sem isso nenhuma palavra bateria
     if (!p || rank.has(p)) return;
     rank.set(p, i);
     const chave = semAcento(p);

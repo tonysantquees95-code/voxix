@@ -87,3 +87,10 @@ test("ao enviar, a última palavra também é conferida", () => {
   assert.equal(corrigirFim(D, nenhuma, "ola"), "olá");
   assert.equal(corrigirFim(D, nenhuma, "tudo bem"), "tudo bem");
 });
+
+test("dicionário com fim de linha do Windows (\\r\\n) funciona igual", () => {
+  const d = criarDicionario(["vendo\r", "testando\r", "alguns\r", "alguma\r"]);
+  assert.equal(sugerir(d, "vendo").valida, true);
+  assert.equal(sugerir(d, "vebdo").auto, "vendo");
+  assert.equal(sugerir(d, "Testanndo").auto, "Testando");
+});

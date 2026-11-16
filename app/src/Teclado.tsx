@@ -14,11 +14,12 @@ interface Props {
   podeEnviar: boolean;
 }
 
-/** Cor do LED desta batida: a do tema, uma que gira pelo arco-íris, ou a escolhida. */
-function corDoToque(led: "tema" | "arco" | "cor", ledCor: string, n: number): string {
-  if (led === "arco") return `hsl(${(n * 47) % 360} 100% 60%)`;
-  if (led === "cor") return ledCor;
-  return "var(--color-neon)";
+/** A luz que corre em volta do teclado: dois riscos brancos, ou as cores do logo (RGB ou uma cor só). Só gira (transform): não pesa na digitação. */
+function gradienteDaLuz(efeito: "brilho" | "logo", luz: { modo: string; cor: string }): string {
+  const risco = (p: number, cor: string, tam = 0.17) => `transparent ${p}turn, ${cor} ${p + tam}turn, transparent ${p + tam + 0.006}turn`;
+  if (efeito === "brilho" || luz.modo === "branca") return `conic-gradient(${risco(0.02, "#fff")}, ${risco(0.52, "#fff")}, transparent 1turn)`;
+  if (luz.modo === "cor") return `conic-gradient(${risco(0.02, luz.cor)}, ${risco(0.52, luz.cor)}, transparent 1turn)`;
+  return `conic-gradient(${risco(0.0, "#ff2a2a", 0.13)}, ${risco(0.33, "#2aff5a", 0.13)}, ${risco(0.66, "#2a6bff", 0.13)}, transparent 1turn)`;
 }
 
 interface TeclaProps { children: ReactNode; onPress: () => void; acender: (el: HTMLElement) => void; larga?: number; ativa?: boolean; rotulo: string; classe?: string; repetir?: boolean; aoSoltar?: boolean }
@@ -59,20 +60,14 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   const [shift, setShift] = useState<"nao" | "uma" | "trava">("nao");
   const [popup, setPopup] = useState<{ letra: string; opcoes: string[] } | null>(null);
   const [recentes, setRecentes] = useState<string[]>(lerRecentes);
-  const batidas = useRef(0);
   const segurou = useRef<number | null>(null);
 
   useEffect(() => () => { if (segurou.current) window.clearTimeout(segurou.current); }, []);
 
   const maiuscula = shift !== "nao" || (inicioDeFrase && pagina === "letras");
 
-  const acender = (el: HTMLElement) => {
-    batidas.current += 1;
+  const acender = (_el: HTMLElement) => {
     if (t.vibrar) window.setTimeout(() => { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }, 0);
-    if (t.efeito === "nenhum") return;
-    el.style.setProperty("--led", t.efeito === "brilho" ? "#ffffff" : corDoToque(t.led, t.ledCor, batidas.current));
-    // a luz é só a transparência de uma camada por cima da tecla: não força o app a refazer o desenho da tela a cada toque
-    try { el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: "ease-out", pseudoElement: "::after" }); } catch { /* sem luz neste aparelho */ }
   };
 
   const digitar = (s: string) => {
@@ -116,6 +111,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
 
   return (
     <div className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>
+      {t.efeito !== "nenhum" && <div className="teclado-luz" aria-hidden="true"><i style={{ backgroundImage: gradienteDaLuz(t.efeito, v.luz) }} /></div>}
       {pagina === "emojis" ? (
         <>
           <div className="mb-1 flex gap-1 overflow-x-auto rolagem pb-1" role="tablist" aria-label="Pacotes de emojis">

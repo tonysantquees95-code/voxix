@@ -246,8 +246,7 @@ function AbaTeclado() {
   const t = v.teclado;
   const [prova, setProva] = useState("");
   const formas: { id: FormaTecla; nome: string }[] = [{ id: "redonda", nome: "Redondinho" }, { id: "quadrada", nome: "Quadradinho" }, { id: "futurista", nome: "Futurista" }];
-  const efeitos: { id: EfeitoToque; nome: string }[] = [{ id: "nenhum", nome: "Nenhum" }, { id: "brilho", nome: "Brilho" }, { id: "led", nome: "LED colorido" }];
-  const leds: { id: CorLed; nome: string }[] = [{ id: "tema", nome: "Cor do app" }, { id: "arco", nome: "Arco-íris" }, { id: "cor", nome: "Minha cor" }];
+  const efeitos: { id: EfeitoToque; nome: string }[] = [{ id: "nenhum", nome: "Desligada" }, { id: "brilho", nome: "Branca" }, { id: "logo", nome: "Como o logo" }];
   return (
     <div className="space-y-4">
       <Interruptor ligado={t.usar} aoMudar={(x) => mudarTeclado({ usar: x })} titulo="Usar o teclado do Voxix" dica="Só dele, no mesmo estilo do app. Desligado, vale o teclado do aparelho." />
@@ -258,16 +257,9 @@ function AbaTeclado() {
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Formato das teclas">{formas.map((f) => <Chip key={f.id} cheio ativo={t.forma === f.id} onClick={() => mudarTeclado({ forma: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       <div>
-        <p className="mb-1 text-xs text-suave">Ao tocar numa tecla</p>
-        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Efeito ao tocar">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
+        <p className="mb-1 text-xs text-suave">Luz em volta do teclado</p>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Luz em volta do teclado">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
       </div>
-      {t.efeito === "led" && (
-        <div className="space-y-2">
-          <p className="text-xs text-suave">Cor do LED</p>
-          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Cor do LED">{leds.map((f) => <Chip key={f.id} cheio ativo={t.led === f.id} onClick={() => mudarTeclado({ led: f.id })}>{f.nome}</Chip>)}</div>
-          {t.led === "cor" && <SeletorRgb valor={t.ledCor} aoMudar={(h) => mudarTeclado({ ledCor: h })} />}
-        </div>
-      )}
       <Interruptor ligado={t.vibrar} aoMudar={(x) => mudarTeclado({ vibrar: x })} titulo="Vibrar ao tocar" dica="Uma batidinha leve em cada tecla." />
       <div>
         <p className="mb-1 text-xs text-suave">Altura das teclas</p>

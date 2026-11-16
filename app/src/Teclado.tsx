@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, useState, type CSSProperties, type PointerEven
 import { Icone } from "./icones";
 import { PACOTES, RECENTES_ID, guardarRecentes, lerRecentes, somarRecente } from "./emojis";
 import { mudarVisual } from "./personalizar";
-import { ACENTOS, LETRAS, NUMEROS, TECLADO_ALTURA } from "./edicaoTeclado";
+import { ACENTOS, DICAS, LETRAS, LINHA_NUMEROS, NUMEROS, TECLADO_ALTURA } from "./edicaoTeclado";
 import { useVisual } from "./useVisual";
 
 interface Props {
@@ -38,9 +38,11 @@ function Tecla({ children, onPress, acender, larga, ativa, rotulo, classe = "", 
       type="button" aria-label={rotulo} data-ativa={ativa ? "sim" : undefined}
       className={`tecla ${classe}`} style={{ flex: larga ?? 1 }}
       onPointerDown={(e) => {
-        e.preventDefault(); acender(e.currentTarget);
-        if (repetir) { onPress(); espera.current = window.setTimeout(() => { intervalo.current = window.setInterval(onPress, 55); }, 350); }
-        else if (!aoSoltar) onPress();
+        e.preventDefault();
+        const el = e.currentTarget;
+        if (repetir) { onPress(); acender(el); espera.current = window.setTimeout(() => { intervalo.current = window.setInterval(onPress, 55); }, 350); }
+        else if (!aoSoltar) { onPress(); acender(el); } // primeiro a letra entra; luz e vibração vêm depois, sem atrasar o texto
+        else acender(el);
       }}
       onPointerUp={() => { if (repetir) parar(); else if (aoSoltar) onPress(); }}
       onPointerLeave={parar} onPointerCancel={parar}
@@ -66,7 +68,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
 
   const acender = (el: HTMLElement) => {
     batidas.current += 1;
-    if (t.vibrar) { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }
+    if (t.vibrar) window.setTimeout(() => { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }, 0);
     if (t.efeito === "nenhum") return;
     el.style.setProperty("--led", t.efeito === "brilho" ? "#ffffff" : corDoToque(t.led, t.ledCor, batidas.current));
     // a luz é só a transparência de uma camada por cima da tecla: não força o app a refazer o desenho da tela a cada toque
@@ -85,11 +87,20 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   // A letra entra assim que o dedo encosta. Se o dedo ficar, abre as variações com acento e a escolhida troca a letra já escrita.
   const comecoDeLetra = (e: PointerEvent<HTMLButtonElement>, letra: string) => {
     e.preventDefault();
-    acender(e.currentTarget);
+    const el = e.currentTarget;
     digitar(maiuscula ? letra.toUpperCase() : letra);
+    acender(el);
     parar();
-    const op = ACENTOS[letra];
-    if (op) segurou.current = window.setTimeout(() => { setPopup({ letra, opcoes: op.map((o) => (maiuscula ? o.toUpperCase() : o)) }); }, 380);
+    const acentos = ACENTOS[letra] ?? [];
+    const dica = DICAS[letra];
+    if (acentos.length) {
+      // segurar abre as variações (o símbolo pequeno da tecla vem junto); a escolhida troca a letra já escrita
+      const opcoes = [...(dica ? [dica] : []), ...acentos].map((o) => (maiuscula ? o.toUpperCase() : o));
+      segurou.current = window.setTimeout(() => setPopup({ letra, opcoes }), 380);
+    } else if (dica) {
+      // como no teclado do celular: segurar uma letra sem acento digita o símbolo pequeno dela
+      segurou.current = window.setTimeout(() => { aoApagar(); aoInserir(dica); }, 380);
+    }
   };
   const escolherAcento = (o: string) => { aoApagar(); aoInserir(o); setPopup(null); };
 
@@ -135,6 +146,11 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
               <button type="button" aria-label="Fechar" onPointerDown={(e) => { e.preventDefault(); setPopup(null); }}><Icone nome="fechar" tam={18} /></button>
             </div>
           )}
+          {pagina === "letras" && (
+            <div className="linha-tecla">
+              {LINHA_NUMEROS.map((n) => <Tecla key={n} acender={acender} rotulo={n} onPress={() => digitar(n)} classe="tecla-num">{n}</Tecla>)}
+            </div>
+          )}
           {linhas.map((l, i) => (
             <div key={i} className="linha-tecla" style={i === 1 && pagina === "letras" ? { paddingInline: "4%" } : undefined}>
               {i === 2 && (
@@ -144,6 +160,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
                 pagina === "letras" ? (
                   <button key={ch} type="button" className="tecla" style={{ flex: 1 }} aria-label={ch}
                     onPointerDown={(e) => comecoDeLetra(e, ch)} onPointerUp={parar} onPointerLeave={parar} onPointerCancel={parar} onContextMenu={(e) => e.preventDefault()}>
+                    {DICAS[ch] && <span className="dica" aria-hidden="true">{DICAS[ch]}</span>}
                     {maiuscula ? ch.toUpperCase() : ch}
                   </button>
                 ) : <Tecla key={ch} acender={acender} rotulo={ch} onPress={() => digitar(ch)}>{ch}</Tecla>
@@ -152,13 +169,12 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
             </div>
           ))}
           <div className="linha-tecla">
-            <Tecla acender={acender} rotulo={pagina === "letras" ? "Números e símbolos" : "Letras"} onPress={() => setPagina(pagina === "letras" ? "numeros" : "letras")} larga={1.3} classe="tecla-fn">{pagina === "letras" ? "123" : "ABC"}</Tecla>
-            <Tecla acender={acender} rotulo="Emojis" onPress={() => setPagina("emojis")} larga={1.1} classe="tecla-fn"><Icone nome="emoji" tam={22} /></Tecla>
-            <Tecla acender={acender} rotulo="Vírgula" onPress={() => digitar(",")} larga={0.8}>,</Tecla>
-            <Tecla acender={acender} rotulo="Espaço" onPress={() => aoInserir(" ")} larga={3.2}>espaço</Tecla>
-            <Tecla acender={acender} rotulo="Ponto" onPress={() => digitar(".")} larga={0.8}>.</Tecla>
-            <Tecla acender={acender} rotulo="Nova linha" onPress={() => aoInserir("\n")} larga={1.1} classe="tecla-fn"><Icone nome="enter" tam={22} /></Tecla>
-            <Tecla acender={acender} rotulo="Enviar" onPress={() => { if (podeEnviar) aoEnviar(); }} aoSoltar larga={1.3} classe={`tecla-enviar ${podeEnviar ? "" : "opacity-50"}`}><Icone nome="enviar" tam={22} /></Tecla>
+            <Tecla acender={acender} rotulo={pagina === "letras" ? "Números e símbolos" : "Letras"} onPress={() => setPagina(pagina === "letras" ? "numeros" : "letras")} larga={1.5} classe="tecla-fn">{pagina === "letras" ? "?123" : "ABC"}</Tecla>
+            <Tecla acender={acender} rotulo="Vírgula" onPress={() => digitar(",")} larga={1}>,</Tecla>
+            <Tecla acender={acender} rotulo="Emojis" onPress={() => setPagina("emojis")} larga={1} classe="tecla-fn"><Icone nome="emoji" tam={22} /></Tecla>
+            <Tecla acender={acender} rotulo="Espaço" onPress={() => aoInserir(" ")} larga={5.4} classe="tecla-espaco">espaço</Tecla>
+            <Tecla acender={acender} rotulo="Ponto" onPress={() => digitar(".")} larga={1}>.</Tecla>
+            <Tecla acender={acender} rotulo="Nova linha" onPress={() => aoInserir("\n")} larga={1.5} classe="tecla-fn"><Icone nome="enter" tam={22} /></Tecla>
           </div>
         </>
       )}

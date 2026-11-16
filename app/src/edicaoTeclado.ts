@@ -9,6 +9,14 @@ export const NUMEROS: string[][] = [
   ["@", "#", "$", "%", "&", "-", "+", "(", ")", "/"],
   ["*", "\"", "'", ":", ";", "!", "?"],
 ];
+/** Fileira de números que fica em cima das letras (como no teclado do Android). */
+export const LINHA_NUMEROS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+/** Símbolo pequeno no canto de cada letra (como no teclado do Android); segurar a tecla digita ele. */
+export const DICAS: Record<string, string> = {
+  q: "%", w: "\\", e: "|", r: "=", t: "[", y: "]", u: "<", i: ">", o: "{", p: "}",
+  a: "@", s: "#", d: "$", f: "-", g: "&", h: "-", j: "+", k: "(", l: ")",
+  z: "*", x: "\"", c: "'", v: ":", b: ";", n: "!", m: "?",
+};
 /** Letras que abrem as variações com acento ao segurar. */
 export const ACENTOS: Record<string, string[]> = {
   a: ["á", "à", "â", "ã", "ä"], e: ["é", "è", "ê", "ë"], i: ["í", "ì", "î", "ï"],

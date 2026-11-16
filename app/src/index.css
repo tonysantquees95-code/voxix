@@ -29,7 +29,7 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .luz-faixa, .luz-faixa.luz-rgb { animation: none; } }
 
 /* Ícone sobre fundo na cor do app fica sempre branco (senão, com "ícones na cor do app", sumia no botão). */
-.bg-neon svg, .tecla-enviar svg, .balao-meu svg { color: #fff !important; }
+.bg-neon svg, .tecla-enviar svg, .balao-meu svg, .avatar svg { color: #fff !important; }
 
 /* ---- formato dos ícones, avatares, balões e botões (Ajustes › Personalizar › Formato) ---- */
 :root { --r-balao: 1.1rem; --r-avatar: 9999px; --r-botao: 9999px; --r-tecla: .8rem; }
@@ -57,11 +57,14 @@ button { cursor: pointer; }
 .teclado { padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--color-painel) 94%, var(--color-neon)); border-top: 1px solid var(--color-borda); user-select: none; -webkit-user-select: none; touch-action: manipulation; position: relative; }
 .linha-tecla { display: flex; gap: 5px; margin-bottom: 5px; }
 .tecla { --led: var(--color-neon); position: relative; height: var(--alt-tecla, 54px); min-width: 0; display: grid; place-items: center; font-size: 1.2rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); clip-path: var(--corte-tecla); -webkit-tap-highlight-color: transparent; touch-action: none; }
+.tecla-num { height: calc(var(--alt-tecla, 54px) * .74); font-size: 1.05rem; }
+.tecla-espaco { font-size: 1rem; color: var(--color-suave); }
+.dica { position: absolute; top: 2px; right: 5px; font-size: .62rem; font-weight: 500; line-height: 1; opacity: .55; pointer-events: none; }
 .tecla:active { background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
 .tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
 .tecla-enviar { background: var(--color-neon); border-color: var(--color-neon); color: #fff; font-size: 1.15rem; }
-.tecla::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in srgb, var(--led) 38%, transparent); box-shadow: inset 0 0 0 1.5px var(--led), 0 0 14px 2px var(--led); }
+.tecla::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in srgb, var(--led) 38%, transparent); box-shadow: inset 0 0 0 1.5px var(--led); }
 .popup-acento { position: absolute; left: 6px; right: 6px; top: -52px; display: flex; gap: 4px; padding: 6px; background: var(--color-painel); border: 1px solid var(--color-neon); border-radius: var(--r-balao); z-index: 5; }
 .popup-acento button { flex: 1; height: 38px; font-size: 1.15rem; border-radius: var(--r-tecla); background: color-mix(in srgb, var(--color-neon) 20%, transparent); color: var(--color-texto); }
 .pacote { flex: none; width: 38px; height: 34px; font-size: 1.2rem; border-radius: var(--r-tecla); border: 1px solid transparent; }

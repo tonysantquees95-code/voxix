@@ -22,6 +22,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 15, data: "2026-11-15", tipo: "melhoria", titulo: "Teclado maior e com Enter", texto: "As teclas ficaram maiores (a altura continua ajustável em Personalizar › Teclado) e entrou a tecla de Enter, para pular de linha sem enviar." },
   { id: 16, data: "2026-11-15", tipo: "correcao", titulo: "Campo de mensagem que acompanha", texto: "O campo de mensagem agora cresce conforme você escreve (até umas 6 linhas, depois rola por dentro). O texto não some mais quando passa da primeira linha." },
   { id: 17, data: "2026-11-15", tipo: "novo", titulo: "Corretor automático em português", texto: "Uma faixa em cima do teclado sugere palavras enquanto você escreve, e ao dar espaço o Voxix coloca os acentos e conserta erros comuns (voce vira você). Apagar logo depois desfaz a troca, e tocar na palavra entre aspas faz o Voxix aprender a deixar como está. Funciona no celular e no computador; dá para desligar em Ajustes › Personalizar › Teclado." },
+  { id: 18, data: "2026-11-16", tipo: "melhoria", titulo: "Teclado igual ao do Android, e mais rápido", texto: "O teclado do Voxix agora tem a fileira de números em cima, o símbolo pequeno em cada letra (segure a tecla para digitar) e uma barra de espaço bem maior. Também ficou mais leve: a letra entra assim que você toca, sem travar.", },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

@@ -53,10 +53,12 @@ export interface Teclado {
   vibrar: boolean;
   altura: AlturaTeclado;
   corretor: boolean;        // sugere e corrige palavras em português enquanto escreve
-  ajusteX: number;          // quantos px o toque da pessoa costuma cair à direita da tecla (negativo: à esquerda); 0 = sem ajuste
+  ajusteX: number;          // quantos px o toque da pessoa costuma cair à direita da tecla (negativo: à esquerda); 0 = sem ajuste. Vale na ponta ESQUERDA do teclado
   ajusteY: number;          // idem para baixo (negativo: para cima)
+  ajusteDirX: number;       // o mesmo, na ponta DIREITA do teclado (no meio vale o valor entre as duas pontas: o polegar erra diferente de cada lado)
+  ajusteDirY: number;
 }
-export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "brilho", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media", corretor: true, ajusteX: 0, ajusteY: 0 };
+export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "brilho", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media", corretor: true, ajusteX: 0, ajusteY: 0, ajusteDirX: 0, ajusteDirY: 0 };
 
 /** Desenho dos ícones do app (engrenagem, enviar, microfone…): espessura do traço, tamanho, estilo e cor. */
 export type Traco = "fino" | "medio" | "grosso";
@@ -110,6 +112,20 @@ export function limparPapel(v: unknown): Papel {
 }
 /** Até onde o ajuste do toque pode ir (px): acima disso o toque erraria mais do que acerta. */
 export const AJUSTE_MAX = 14;
+/** Reta que melhor liga a posição na largura (0 a 1) ao desvio medido; devolve o desvio na ponta esquerda (0) e na direita (1). */
+export function pontasDoDesvio(f: number[], d: number[]): [number, number] {
+  const n = f.length, mf = f.reduce((a, b) => a + b, 0) / n, md = d.reduce((a, b) => a + b, 0) / n;
+  let cov = 0, vr = 0;
+  for (let k = 0; k < n; k++) { cov += (f[k] - mf) * (d[k] - md); vr += (f[k] - mf) ** 2; }
+  const b = vr > 0 ? cov / vr : 0, a = md - b * mf;
+  return [a, a + b];
+}
+
+function ajustes(o: Record<string, unknown>) {
+  const ax = limite(o.ajusteX, -AJUSTE_MAX, AJUSTE_MAX, 0), ay = limite(o.ajusteY, -AJUSTE_MAX, AJUSTE_MAX, 0);
+  // quem guardou só um ajuste (versão anterior) fica com o mesmo valor nas duas pontas
+  return { ajusteX: ax, ajusteY: ay, ajusteDirX: limite(o.ajusteDirX, -AJUSTE_MAX, AJUSTE_MAX, ax), ajusteDirY: limite(o.ajusteDirY, -AJUSTE_MAX, AJUSTE_MAX, ay) };
+}
 export function limparTeclado(v: unknown): Teclado {
   const o = obj(v);
   const b = (x: unknown, p: boolean) => (typeof x === "boolean" ? x : p);
@@ -122,7 +138,7 @@ export function limparTeclado(v: unknown): Teclado {
     vibrar: b(o.vibrar, TECLADO_PADRAO.vibrar),
     altura: um(["baixa", "media", "alta"] as const, o.altura, TECLADO_PADRAO.altura),
     corretor: b(o.corretor, TECLADO_PADRAO.corretor),
-    ajusteX: limite(o.ajusteX, -AJUSTE_MAX, AJUSTE_MAX, 0), ajusteY: limite(o.ajusteY, -AJUSTE_MAX, AJUSTE_MAX, 0),
+    ...ajustes(o),
   };
 }
 

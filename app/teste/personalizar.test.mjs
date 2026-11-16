@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ICONES_PADRAO, limparIcones, TRACOS, ESCALAS_ICONE, coresDe, girarMatiz, hexDe, hexValido, limparVisual, limparTeclado, TECLADO_PADRAO, AJUSTE_MAX, limparLuz, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
+import { ICONES_PADRAO, limparIcones, TRACOS, ESCALAS_ICONE, coresDe, girarMatiz, hexDe, hexValido, limparVisual, limparTeclado, pontasDoDesvio, TECLADO_PADRAO, AJUSTE_MAX, limparLuz, rgbDe, TEMAS, VISUAL_PADRAO, temaDe } from "../src/personalizar.ts";
 
 test("limparVisual: lixo volta ao padrão e valores válidos passam", () => {
   assert.deepEqual(limparVisual(null), VISUAL_PADRAO);
@@ -75,7 +75,19 @@ test("ajuste do toque: começa em zero, aceita pouco e nunca passa do limite", (
   assert.deepEqual([limparTeclado({}).ajusteX, limparTeclado({}).ajusteY], [0, 0]);
   const t = limparTeclado({ ajusteX: 6, ajusteY: -4 });
   assert.deepEqual([t.ajusteX, t.ajusteY], [6, -4]);
+  assert.deepEqual([t.ajusteDirX, t.ajusteDirY], [6, -4], "quem só tinha um ajuste fica igual nas duas pontas");
+  const dois = limparTeclado({ ajusteX: 1, ajusteY: 0, ajusteDirX: 9, ajusteDirY: 3 });
+  assert.deepEqual([dois.ajusteX, dois.ajusteDirX, dois.ajusteDirY], [1, 9, 3]);
   const g = limparTeclado({ ajusteX: 99, ajusteY: -99 });
   assert.deepEqual([g.ajusteX, g.ajusteY], [AJUSTE_MAX, -AJUSTE_MAX]);
   assert.equal(limparTeclado({ ajusteX: "x" }).ajusteX, 0);
+});
+
+test("ajuste do toque: o desvio é medido separado na esquerda e na direita", () => {
+  const f = [0.14, 0.5, 0.86, 0.3, 0.7, 0.14, 0.5, 0.86];
+  const [e, d] = pontasDoDesvio(f, f.map((x) => -2 + 8 * x)); // dedo cai 2 px à esquerda de um lado e 6 px à direita do outro
+  assert.ok(Math.abs(e - -2) < 1e-9 && Math.abs(d - 6) < 1e-9);
+  const [e2, d2] = pontasDoDesvio(f, f.map(() => 4)); // desvio igual em tudo
+  assert.ok(Math.abs(e2 - 4) < 1e-9 && Math.abs(d2 - 4) < 1e-9);
+  assert.deepEqual(pontasDoDesvio([0.5, 0.5], [3, 5]), [4, 4]); // todos na mesma posição: média, sem inclinação
 });

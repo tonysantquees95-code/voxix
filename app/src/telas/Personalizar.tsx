@@ -4,7 +4,7 @@ import { Icone, type NomeIcone } from "../icones";
 import { Logo } from "../logo";
 import { PapelDeParede, fotoDo, guardarFoto, reduzirImagem, useFoto, type Qual } from "../papel";
 import {
-  AJUSTE_MAX, FORMATOS, MODELOS_PAPEL, MODOS_LUZ, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarLuz, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
+  AJUSTE_MAX, FORMATOS, pontasDoDesvio, MODELOS_PAPEL, MODOS_LUZ, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarLuz, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
   type CorLed, type EfeitoToque, type FormaTecla, type Formato, type ModeloPapel,
 } from "../personalizar";
 import { Teclado } from "../Teclado";
@@ -243,15 +243,13 @@ function AbaEmojis() {
 
 /** Bolinhas onde a pessoa toca do jeito que digita; a média de quanto o dedo cai fora do centro vira o ajuste do teclado. */
 const ALVOS: [number, number][] = [[0.14, 0.2], [0.5, 0.16], [0.86, 0.2], [0.3, 0.52], [0.7, 0.52], [0.14, 0.84], [0.5, 0.8], [0.86, 0.84]];
-const mediana = (v: number[]) => { const o = [...v].sort((a, b) => a - b); const m = o.length >> 1; return o.length % 2 ? o[m] : (o[m - 1] + o[m]) / 2; };
-
 function AjusteDoToque() {
   const t = useVisual().teclado;
   const [fazendo, setFazendo] = useState(false);
   const [medidas, setMedidas] = useState<[number, number][]>([]);
   const area = useRef<HTMLDivElement>(null);
   const passo = medidas.length;
-  const sem = !t.ajusteX && !t.ajusteY;
+  const sem = !t.ajusteX && !t.ajusteY && !t.ajusteDirX && !t.ajusteDirY;
   const limitar = (n: number) => Math.max(-AJUSTE_MAX, Math.min(AJUSTE_MAX, Math.round(n)));
   const tocar = (e: PointerEvent<HTMLDivElement>) => {
     const a = area.current;
@@ -260,11 +258,15 @@ function AjusteDoToque() {
     const [fx, fy] = ALVOS[passo];
     const novas = [...medidas, [e.clientX - (r.left + r.width * fx), e.clientY - (r.top + r.height * fy)] as [number, number]];
     if (novas.length < ALVOS.length) { setMedidas(novas); return; }
-    mudarTeclado({ ajusteX: limitar(mediana(novas.map((m) => m[0]))), ajusteY: limitar(mediana(novas.map((m) => m[1]))) });
+    const fs = ALVOS.map((x) => x[0]);
+    const [xe, xd] = pontasDoDesvio(fs, novas.map((m) => m[0]));
+    const [ye, yd] = pontasDoDesvio(fs, novas.map((m) => m[1]));
+    mudarTeclado({ ajusteX: limitar(xe), ajusteY: limitar(ye), ajusteDirX: limitar(xd), ajusteDirY: limitar(yd) });
     setMedidas([]);
     setFazendo(false);
   };
-  const resumo = sem ? "Sem ajuste." : `Seu dedo costuma cair ${Math.abs(t.ajusteX)} px ${t.ajusteX < 0 ? "à esquerda" : "à direita"} e ${Math.abs(t.ajusteY)} px ${t.ajusteY < 0 ? "acima" : "abaixo"} da tecla; o teclado já compensa.`;
+  const lado = (x: number, y: number) => `${Math.abs(x)} px ${x < 0 ? "para a esquerda" : "para a direita"} e ${Math.abs(y)} px ${y < 0 ? "para cima" : "para baixo"}`;
+  const resumo = sem ? "Sem ajuste." : `Seu dedo cai, na ponta esquerda, ${lado(t.ajusteX, t.ajusteY)}; na ponta direita, ${lado(t.ajusteDirX, t.ajusteDirY)}. O teclado já compensa.`;
   return (
     <div className="space-y-2">
       <p className="text-sm">Ajustar o toque<span className="block text-xs text-suave">Se o teclado costuma pegar a tecla do lado, toque nas 8 bolinhas do jeito que você digita (com os polegares) e o Voxix passa a compensar. {resumo}</span></p>
@@ -279,7 +281,7 @@ function AjusteDoToque() {
       ) : (
         <div className="grid grid-cols-2 gap-2">
           <Chip ativo={false} onClick={() => { setMedidas([]); setFazendo(true); }}>{sem ? "Ajustar agora" : "Ajustar de novo"}</Chip>
-          <Chip ativo={false} onClick={() => mudarTeclado({ ajusteX: 0, ajusteY: 0 })}>Zerar</Chip>
+          <Chip ativo={false} onClick={() => mudarTeclado({ ajusteX: 0, ajusteY: 0, ajusteDirX: 0, ajusteDirY: 0 })}>Zerar</Chip>
         </div>
       )}
     </div>

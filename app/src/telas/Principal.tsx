@@ -33,7 +33,7 @@ export function Principal() {
   const naoLidas = totalNaoLidas(armazem);
 
   return (
-    <div className="grid h-full md:grid-cols-[340px_1fr]">
+    <div className="grid h-full grid-cols-[minmax(0,1fr)] md:grid-cols-[340px_minmax(0,1fr)]">
       <aside className={`${algoAberto ? "hidden md:flex" : "flex"} relative min-h-0 flex-col overflow-hidden border-r border-borda bg-painel`}>
         <PapelDeParede qual="inicio" />
         <header className="relative z-[1] flex items-center gap-3 px-4 py-3">

@@ -89,6 +89,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   dicRef.current = dic;
   // computador (mouse e teclado físico): a faixa de sugestões flutua em cima do campo
   const tecladoFisico = MOUSE_E_TECLADO;
+  const campoCheio = useRef(false);
   const alturaCampo = useRef(0);
   const textoAnterior = useRef("");
   const cursorPendente = useRef<number | null>(null);
@@ -111,10 +112,21 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   useEffect(() => {
     const el = caixa.current;
     if (!CAMPO_AUTOMATICO || !el || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => fim.current?.scrollIntoView({ block: "end" }));
+    const ro = new ResizeObserver((entradas) => {
+      const alto = entradas[entradas.length - 1]?.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+      campoCheio.current = alto >= ALTURA_MAX_CAMPO - 1;
+      if (campoCheio.current) el.scrollTop = el.scrollHeight; // chegou no máximo: daqui em diante o texto rola por dentro
+      fim.current?.scrollIntoView({ block: "end" });
+    });
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+  // Campo no tamanho máximo: acompanha o cursor (o navegador não rola sozinho quando o texto entra pelo teclado do Voxix).
+  useLayoutEffect(() => {
+    const el = caixa.current;
+    if (!CAMPO_AUTOMATICO || !campoCheio.current || !el) return;
+    if ((el.selectionStart ?? texto.length) >= texto.length) el.scrollTop = el.scrollHeight;
+  }, [texto]);
   useEffect(() => { // depois de desenhar a letra (não trava o toque seguinte)
     if (CAMPO_AUTOMATICO) return;
     const el = caixa.current;
@@ -294,7 +306,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
           onSelect={(e) => setCursor(e.currentTarget.selectionStart ?? 0)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); return; } aoTeclar(e); }}
           rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} lang="pt-BR" autoCapitalize="sentences" autoCorrect={proprio ? "off" : "on"} spellCheck={!proprio && !(corretorLigado && tecladoFisico)}
-          style={{ maxHeight: ALTURA_MAX_CAMPO }} className={`balao min-h-11 flex-1 resize-none border border-borda bg-fundo px-4 py-2.5 leading-6 outline-none focus:border-neon ${CAMPO_AUTOMATICO ? "field-sizing-content overflow-y-auto" : "overflow-hidden"}`} />
+          style={{ maxHeight: ALTURA_MAX_CAMPO }} className={`balao min-h-11 min-w-0 flex-1 resize-none [overflow-wrap:anywhere] border border-borda bg-fundo px-4 py-2.5 leading-6 outline-none focus:border-neon ${CAMPO_AUTOMATICO ? "field-sizing-content overflow-y-auto" : "overflow-hidden"}`} />
         <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar"><Icone nome="enviar" tam={22} /></button>
       </form>
       {proprio && tecladoAberto && (

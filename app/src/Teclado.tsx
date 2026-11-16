@@ -137,23 +137,28 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
     guardarRecentes(l);
   };
 
-  // Ajuste do toque (Personalizar › Teclado › Ajustar o toque): se o dedo da pessoa costuma cair um pouco ao lado,
-  // o toque é refeito com essa folga e vale a tecla mais perto do ponto corrigido.
+  // Toque que não caiu numa tecla (margem da fileira, vão entre teclas) vale para a tecla mais perto, e, se a pessoa fez o
+  // "Ajustar o toque" (Personalizar › Teclado), o toque é refeito com a folga dela (diferente na ponta esquerda e na direita).
   const raiz = useRef<HTMLDivElement>(null);
   const refazendo = useRef(false);
   const corrigirToque = (e: PointerEvent<HTMLDivElement>) => {
-    if (refazendo.current || (!t.ajusteX && !t.ajusteY)) return;
-    const tocada = (e.target as HTMLElement).closest("button.tecla");
-    if (!tocada || !raiz.current) return;
-    const x = e.clientX - t.ajusteX, y = e.clientY - t.ajusteY;
-    let melhor: Element = tocada, menor = Infinity;
-    for (const b of raiz.current.querySelectorAll("button.tecla")) {
+    const caixa = raiz.current;
+    if (refazendo.current || !caixa) return;
+    const alvo = e.target as HTMLElement;
+    const tocada = alvo.closest("button.tecla");
+    if (!tocada && alvo !== caixa && !alvo.classList.contains("linha-tecla")) return; // sugestões, emojis, menu de acentos: cada um cuida do seu
+    if (tocada && !t.ajusteX && !t.ajusteY && !t.ajusteDirX && !t.ajusteDirY) return; // sem ajuste, a tecla sob o dedo vale (e não custa nada)
+    const quadro = caixa.getBoundingClientRect();
+    const lado = quadro.width > 0 ? Math.max(0, Math.min(1, (e.clientX - quadro.left) / quadro.width)) : 0.5;
+    const x = e.clientX - (t.ajusteX + (t.ajusteDirX - t.ajusteX) * lado), y = e.clientY - (t.ajusteY + (t.ajusteDirY - t.ajusteY) * lado);
+    let melhor: Element | null = tocada, menor = Infinity;
+    for (const b of caixa.querySelectorAll("button.tecla")) {
       const r = b.getBoundingClientRect();
       const dx = (x - (r.left + r.width / 2)) / (r.width / 2), dy = (y - (r.top + r.height / 2)) / (r.height / 2);
       const d = dx * dx + dy * dy;
       if (d < menor) { menor = d; melhor = b; }
     }
-    if (melhor === tocada) return;
+    if (!melhor || melhor === tocada) return;
     e.stopPropagation(); // este toque não vale: o dedo queria a outra tecla
     refazendo.current = true;
     try { melhor.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true, pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary, clientX: e.clientX, clientY: e.clientY })); }

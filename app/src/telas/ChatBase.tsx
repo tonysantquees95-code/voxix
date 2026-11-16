@@ -10,10 +10,18 @@ import type { ReactNode } from "react";
 import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../edicaoTeclado";
 import { SEPARADORES, aplicarSeparador, corrigirFim, desfazerCorrecao, palavraAntesDoCursor, sugerir, trocarPalavra, type Correcao } from "../corretor";
 import { aprender, palavrasDaPessoa, useCorretor } from "../useCorretor";
+import { mudarTeclado } from "../personalizar";
 import { useVisual } from "../useVisual";
 
 /** Altura máxima do campo de mensagem: cresce com as linhas e, passando disso, rola por dentro. */
 const ALTURA_MAX_CAMPO = 168;
+
+// Perguntados uma vez só: matchMedia a cada letra era trabalho à toa.
+const midia = (q: string) => typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia(q).matches;
+const TELA_DE_TOQUE = midia("(pointer: coarse)");
+const MOUSE_E_TECLADO = midia("(pointer: fine)");
+/** O navegador mede sozinho a altura do campo (sem a gente forçar o cálculo da tela a cada letra). */
+const CAMPO_AUTOMATICO = typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("field-sizing", "content");
 
 const SEM_OPCOES: string[] = [];
 
@@ -73,14 +81,14 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   const visual = useVisual();
   const [tecladoAberto, setTecladoAberto] = useState(false);
   // teclado do Voxix: no celular sempre que ligado; no computador só se a pessoa pedir
-  const proprio = visual.teclado.usar && (visual.teclado.noPc || (typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches));
+  const proprio = visual.teclado.usar && (visual.teclado.noPc || TELA_DE_TOQUE);
   const fim = useRef<HTMLDivElement>(null);
   const corretorLigado = visual.teclado.corretor;
   const dic = useCorretor(corretorLigado);
   const dicRef = useRef(dic);
   dicRef.current = dic;
   // computador (mouse e teclado físico): a faixa de sugestões flutua em cima do campo
-  const tecladoFisico = typeof window.matchMedia === "function" && window.matchMedia("(pointer: fine)").matches;
+  const tecladoFisico = MOUSE_E_TECLADO;
   const alturaCampo = useRef(0);
   const textoAnterior = useRef("");
   const cursorPendente = useRef<number | null>(null);
@@ -99,7 +107,16 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   });
 
   // O campo acompanha o que se escreve: cresce linha a linha até o limite e depois rola, sem esconder o texto.
+  // Com `field-sizing: content` só precisamos rolar as mensagens quando o campo muda de tamanho (e isso não custa nada a cada letra).
+  useEffect(() => {
+    const el = caixa.current;
+    if (!CAMPO_AUTOMATICO || !el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => fim.current?.scrollIntoView({ block: "end" }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   useEffect(() => { // depois de desenhar a letra (não trava o toque seguinte)
+    if (CAMPO_AUTOMATICO) return;
     const el = caixa.current;
     if (!el) return;
     // digitar sem quebrar linha não muda a altura: pula a medição pesada (só mede ao crescer ou ao apagar)
@@ -212,6 +229,14 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   };
   mandarRef.current = mandar;
 
+  // Troca entre o teclado do Voxix e o do celular; fecha e abre o campo para o aparelho mostrar o teclado certo.
+  const trocarTeclado = () => {
+    const usarOVoxix = !visual.teclado.usar;
+    mudarTeclado({ usar: usarOVoxix });
+    caixa.current?.blur();
+    window.setTimeout(() => { caixa.current?.focus(); setTecladoAberto(true); }, 60);
+  };
+
   const alternarMicrofone = async () => {
     if (ouvindo) { await ditado.current?.parar(); return; }
     if (!sessao) return;
@@ -261,12 +286,15 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="relative flex items-end gap-2 border-t border-borda bg-painel p-2.5">
         {corretorLigado && !proprio && tecladoFisico && <BarraSugestoes flutuante literal={literal} opcoes={opcoes} aoEscolher={escolherSugestao} />}
         <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome="microfone" tam={22} /></button>
+        {TELA_DE_TOQUE && (
+          <button type="button" onClick={trocarTeclado} aria-label={visual.teclado.usar ? "Usar o teclado do celular" : "Usar o teclado do Voxix"} title={visual.teclado.usar ? "Usar o teclado do celular" : "Usar o teclado do Voxix"} className="botao-redondo grid h-11 w-11 flex-none place-items-center border border-borda text-neon"><Icone nome="teclado" tam={22} /></button>
+        )}
         <textarea ref={caixa} inputMode={proprio ? "none" : undefined} onFocus={() => setTecladoAberto(true)} onClick={() => setTecladoAberto(true)} value={texto}
           onChange={(e) => { marcar(null); textoRef.current = e.target.value; setTexto(e.target.value); setCursor(e.target.selectionStart ?? e.target.value.length); }}
           onSelect={(e) => setCursor(e.currentTarget.selectionStart ?? 0)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); return; } aoTeclar(e); }}
           rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} lang="pt-BR" autoCapitalize="sentences" autoCorrect={proprio ? "off" : "on"} spellCheck={!proprio && !(corretorLigado && tecladoFisico)}
-          style={{ maxHeight: ALTURA_MAX_CAMPO }} className="balao min-h-11 flex-1 resize-none overflow-hidden border border-borda bg-fundo px-4 py-2.5 leading-6 outline-none focus:border-neon" />
+          style={{ maxHeight: ALTURA_MAX_CAMPO }} className={`balao min-h-11 flex-1 resize-none border border-borda bg-fundo px-4 py-2.5 leading-6 outline-none focus:border-neon ${CAMPO_AUTOMATICO ? "field-sizing-content overflow-y-auto" : "overflow-hidden"}`} />
         <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar"><Icone nome="enviar" tam={22} /></button>
       </form>
       {proprio && tecladoAberto && (

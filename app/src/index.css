@@ -64,8 +64,7 @@ button { cursor: pointer; }
 .tecla::before { content: ""; position: absolute; inset: -3px; }
 .linha-tecla > button.tecla:first-of-type::before { left: -8px; }
 .linha-tecla > button.tecla:last-of-type::before { right: -8px; }
-/* feedback do toque: a tecla "cresce" com uma sombra que se abre em volta (sem transform: uma tecla aumentada de verdade passaria a receber o toque dos vizinhos) */
-.tecla:active { box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--color-neon) 30%, var(--color-painel)); background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
+/* sem luz nem mudança de cor ao tocar: o teclado só escreve (a resposta rápida vale mais que o efeito) */
 .tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
 .tecla-enviar { background: var(--color-neon); border-color: var(--color-neon); color: #fff; font-size: 1.15rem; }

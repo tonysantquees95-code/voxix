@@ -53,8 +53,10 @@ export interface Teclado {
   vibrar: boolean;
   altura: AlturaTeclado;
   corretor: boolean;        // sugere e corrige palavras em português enquanto escreve
+  ajusteX: number;          // quantos px o toque da pessoa costuma cair à direita da tecla (negativo: à esquerda); 0 = sem ajuste
+  ajusteY: number;          // idem para baixo (negativo: para cima)
 }
-export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "brilho", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media", corretor: true };
+export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "brilho", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media", corretor: true, ajusteX: 0, ajusteY: 0 };
 
 /** Desenho dos ícones do app (engrenagem, enviar, microfone…): espessura do traço, tamanho, estilo e cor. */
 export type Traco = "fino" | "medio" | "grosso";
@@ -106,6 +108,8 @@ export function limparPapel(v: unknown): Papel {
   const o = obj(v);
   return { modelo: um(MODELOS_PAPEL.map((m) => m.id), o.modelo, PAPEL_PADRAO.modelo), escurecer: limite(o.escurecer, 0, 85, PAPEL_PADRAO.escurecer) };
 }
+/** Até onde o ajuste do toque pode ir (px): acima disso o toque erraria mais do que acerta. */
+export const AJUSTE_MAX = 14;
 export function limparTeclado(v: unknown): Teclado {
   const o = obj(v);
   const b = (x: unknown, p: boolean) => (typeof x === "boolean" ? x : p);
@@ -118,6 +122,7 @@ export function limparTeclado(v: unknown): Teclado {
     vibrar: b(o.vibrar, TECLADO_PADRAO.vibrar),
     altura: um(["baixa", "media", "alta"] as const, o.altura, TECLADO_PADRAO.altura),
     corretor: b(o.corretor, TECLADO_PADRAO.corretor),
+    ajusteX: limite(o.ajusteX, -AJUSTE_MAX, AJUSTE_MAX, 0), ajusteY: limite(o.ajusteY, -AJUSTE_MAX, AJUSTE_MAX, 0),
   };
 }
 

@@ -1,10 +1,10 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { PACOTES } from "../emojis";
 import { Icone, type NomeIcone } from "../icones";
 import { Logo } from "../logo";
 import { PapelDeParede, fotoDo, guardarFoto, reduzirImagem, useFoto, type Qual } from "../papel";
 import {
-  FORMATOS, MODELOS_PAPEL, MODOS_LUZ, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarLuz, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
+  AJUSTE_MAX, FORMATOS, MODELOS_PAPEL, MODOS_LUZ, TEMAS, coresDe, hexDe, hexValido, mudarIcones, mudarLuz, mudarPapel, mudarTeclado, mudarVisual, restaurarVisual, rgbDe,
   type CorLed, type EfeitoToque, type FormaTecla, type Formato, type ModeloPapel,
 } from "../personalizar";
 import { Teclado } from "../Teclado";
@@ -241,6 +241,51 @@ function AbaEmojis() {
   );
 }
 
+/** Bolinhas onde a pessoa toca do jeito que digita; a média de quanto o dedo cai fora do centro vira o ajuste do teclado. */
+const ALVOS: [number, number][] = [[0.14, 0.2], [0.5, 0.16], [0.86, 0.2], [0.3, 0.52], [0.7, 0.52], [0.14, 0.84], [0.5, 0.8], [0.86, 0.84]];
+const mediana = (v: number[]) => { const o = [...v].sort((a, b) => a - b); const m = o.length >> 1; return o.length % 2 ? o[m] : (o[m - 1] + o[m]) / 2; };
+
+function AjusteDoToque() {
+  const t = useVisual().teclado;
+  const [fazendo, setFazendo] = useState(false);
+  const [medidas, setMedidas] = useState<[number, number][]>([]);
+  const area = useRef<HTMLDivElement>(null);
+  const passo = medidas.length;
+  const sem = !t.ajusteX && !t.ajusteY;
+  const limitar = (n: number) => Math.max(-AJUSTE_MAX, Math.min(AJUSTE_MAX, Math.round(n)));
+  const tocar = (e: PointerEvent<HTMLDivElement>) => {
+    const a = area.current;
+    if (!a) return;
+    const r = a.getBoundingClientRect();
+    const [fx, fy] = ALVOS[passo];
+    const novas = [...medidas, [e.clientX - (r.left + r.width * fx), e.clientY - (r.top + r.height * fy)] as [number, number]];
+    if (novas.length < ALVOS.length) { setMedidas(novas); return; }
+    mudarTeclado({ ajusteX: limitar(mediana(novas.map((m) => m[0]))), ajusteY: limitar(mediana(novas.map((m) => m[1]))) });
+    setMedidas([]);
+    setFazendo(false);
+  };
+  const resumo = sem ? "Sem ajuste." : `Seu dedo costuma cair ${Math.abs(t.ajusteX)} px ${t.ajusteX < 0 ? "à esquerda" : "à direita"} e ${Math.abs(t.ajusteY)} px ${t.ajusteY < 0 ? "acima" : "abaixo"} da tecla; o teclado já compensa.`;
+  return (
+    <div className="space-y-2">
+      <p className="text-sm">Ajustar o toque<span className="block text-xs text-suave">Se o teclado costuma pegar a tecla do lado, toque nas 8 bolinhas do jeito que você digita (com os polegares) e o Voxix passa a compensar. {resumo}</span></p>
+      {fazendo ? (
+        <>
+          <div ref={area} onPointerDown={tocar} role="group" aria-label={`Toque na bolinha ${passo + 1} de ${ALVOS.length}`} className="relative h-44 touch-none select-none overflow-hidden rounded-xl border border-borda bg-fundo">
+            <span className="pointer-events-none absolute h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-neon bg-neon/20" style={{ left: `${ALVOS[passo][0] * 100}%`, top: `${ALVOS[passo][1] * 100}%` }} />
+            <span className="pointer-events-none absolute bottom-1 right-2 text-xs text-suave">{passo + 1} de {ALVOS.length}</span>
+          </div>
+          <Chip ativo={false} onClick={() => { setFazendo(false); setMedidas([]); }}>Cancelar</Chip>
+        </>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <Chip ativo={false} onClick={() => { setMedidas([]); setFazendo(true); }}>{sem ? "Ajustar agora" : "Ajustar de novo"}</Chip>
+          <Chip ativo={false} onClick={() => mudarTeclado({ ajusteX: 0, ajusteY: 0 })}>Zerar</Chip>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AbaTeclado() {
   const v = useVisual();
   const t = v.teclado;
@@ -249,7 +294,7 @@ function AbaTeclado() {
   const efeitos: { id: EfeitoToque; nome: string }[] = [{ id: "nenhum", nome: "Desligadas" }, { id: "brilho", nome: "Brancas" }, { id: "rgb", nome: "RGB" }, { id: "cor", nome: "Cor do app" }];
   return (
     <div className="space-y-4">
-      <Interruptor ligado={t.usar} aoMudar={(x) => mudarTeclado({ usar: x })} titulo="Usar o teclado do Voxix" dica="Só dele, no mesmo estilo do app. Desligado, vale o teclado do aparelho." />
+      <Interruptor ligado={t.usar} aoMudar={(x) => mudarTeclado({ usar: x })} titulo="Usar o teclado do Voxix" dica="Ligado: o teclado do app, no mesmo estilo. Desligado: o teclado do seu celular (Gboard ou o que você usa), com o corretor dele. Também dá para trocar pelo botão de teclado ao lado do microfone, na conversa." />
       <Interruptor ligado={t.noPc} aoMudar={(x) => mudarTeclado({ noPc: x })} titulo="Mostrar também no computador" dica="Normalmente ele aparece só em telas de toque." />
       <Interruptor ligado={t.corretor} aoMudar={(x) => mudarTeclado({ corretor: x })} titulo="Corretor automático em português" dica="Sugere palavras em cima do teclado e corrige acentos e erros ao dar espaço. Funciona no celular e no computador." />
       <div>
@@ -261,6 +306,7 @@ function AbaTeclado() {
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Luzes do teclado">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       <Interruptor ligado={t.vibrar} aoMudar={(x) => mudarTeclado({ vibrar: x })} titulo="Vibrar ao tocar" dica="Uma batidinha leve em cada tecla." />
+      <AjusteDoToque />
       <div>
         <p className="mb-1 text-xs text-suave">Altura das teclas</p>
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Altura das teclas">

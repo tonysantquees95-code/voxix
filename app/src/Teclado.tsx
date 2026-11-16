@@ -34,6 +34,18 @@ function Faixa({ n, efeito }: { n: number; efeito: EfeitoToque }) {
 
 interface TeclaProps { children: ReactNode; onPress: () => void; acender: (el: HTMLElement) => void; larga?: number; ativa?: boolean; rotulo: string; classe?: string; repetir?: boolean; aoSoltar?: boolean }
 
+/** Espera o dedo soltar em qualquer lugar da tela: com o ajuste do toque, quem recebe o toque pode não ser a tecla onde o dedo encostou. */
+function aoSoltarDedo(id: number, f: (cancelou: boolean) => void) {
+  const fim = (ev: Event) => {
+    if ((ev as globalThis.PointerEvent).pointerId !== id) return;
+    window.removeEventListener("pointerup", fim);
+    window.removeEventListener("pointercancel", fim);
+    f(ev.type === "pointercancel");
+  };
+  window.addEventListener("pointerup", fim);
+  window.addEventListener("pointercancel", fim);
+}
+
 /** Uma tecla comum. Fica fora do teclado para não ser recriada a cada toque (senão o dedo "perde" a tecla).
  *  Age assim que o dedo encosta (como o teclado do celular), sem esperar soltar; `aoSoltar` é para teclas que não podem disparar sem querer (enviar). */
 function Tecla({ children, onPress, acender, larga, ativa, rotulo, classe = "", repetir, aoSoltar }: TeclaProps) {
@@ -51,11 +63,10 @@ function Tecla({ children, onPress, acender, larga, ativa, rotulo, classe = "", 
       onPointerDown={(e) => {
         e.preventDefault();
         const el = e.currentTarget;
-        if (repetir) { onPress(); acender(el); espera.current = window.setTimeout(() => { intervalo.current = window.setInterval(onPress, 55); }, 350); }
+        if (repetir) { onPress(); acender(el); espera.current = window.setTimeout(() => { intervalo.current = window.setInterval(onPress, 55); }, 350); aoSoltarDedo(e.pointerId, parar); }
         else if (!aoSoltar) { onPress(); acender(el); } // primeiro a letra entra; luz e vibração vêm depois, sem atrasar o texto
-        else acender(el);
+        else { acender(el); aoSoltarDedo(e.pointerId, (cancelou) => { if (!cancelou) onPress(); }); }
       }}
-      onPointerUp={() => { if (repetir) parar(); else if (aoSoltar) onPress(); }}
       onPointerLeave={parar} onPointerCancel={parar}
       onContextMenu={(e) => e.preventDefault()}
     >{children}</button>
@@ -74,6 +85,13 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   const ultimaVibracao = useRef(0);
 
   useEffect(() => () => { if (segurou.current) window.clearTimeout(segurou.current); }, []);
+  // soltou o dedo em qualquer lugar: acaba a espera de "segurar a letra" (o toque pode ter sido corrigido para outra tecla)
+  useEffect(() => {
+    const solta = () => { if (segurou.current) { window.clearTimeout(segurou.current); segurou.current = null; } };
+    window.addEventListener("pointerup", solta);
+    window.addEventListener("pointercancel", solta);
+    return () => { window.removeEventListener("pointerup", solta); window.removeEventListener("pointercancel", solta); };
+  }, []);
 
   const maiuscula = shift !== "nao" || (inicioDeFrase && pagina === "letras");
 
@@ -119,6 +137,29 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
     guardarRecentes(l);
   };
 
+  // Ajuste do toque (Personalizar › Teclado › Ajustar o toque): se o dedo da pessoa costuma cair um pouco ao lado,
+  // o toque é refeito com essa folga e vale a tecla mais perto do ponto corrigido.
+  const raiz = useRef<HTMLDivElement>(null);
+  const refazendo = useRef(false);
+  const corrigirToque = (e: PointerEvent<HTMLDivElement>) => {
+    if (refazendo.current || (!t.ajusteX && !t.ajusteY)) return;
+    const tocada = (e.target as HTMLElement).closest("button.tecla");
+    if (!tocada || !raiz.current) return;
+    const x = e.clientX - t.ajusteX, y = e.clientY - t.ajusteY;
+    let melhor: Element = tocada, menor = Infinity;
+    for (const b of raiz.current.querySelectorAll("button.tecla")) {
+      const r = b.getBoundingClientRect();
+      const dx = (x - (r.left + r.width / 2)) / (r.width / 2), dy = (y - (r.top + r.height / 2)) / (r.height / 2);
+      const d = dx * dx + dy * dy;
+      if (d < menor) { menor = d; melhor = b; }
+    }
+    if (melhor === tocada) return;
+    e.stopPropagation(); // este toque não vale: o dedo queria a outra tecla
+    refazendo.current = true;
+    try { melhor.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, cancelable: true, pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary, clientX: e.clientX, clientY: e.clientY })); }
+    finally { refazendo.current = false; }
+  };
+
   const linhas = pagina === "numeros" ? NUMEROS : LETRAS;
   const base = TECLADO_ALTURA[t.altura];
   // a página de números não tem a fileira de números do alto (0,74 da tecla): as teclas dela crescem para o teclado
@@ -126,7 +167,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   const alt = pagina === "numeros" ? Math.round((base * 4.74 + 6) / 4 * 10) / 10 : base;
 
   return (
-    <div className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>
+    <div ref={raiz} onPointerDownCapture={corrigirToque} className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>
       <BordaLuz efeito={t.efeito} />
       {pagina === "emojis" ? (
         <>

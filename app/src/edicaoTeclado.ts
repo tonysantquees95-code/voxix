@@ -22,7 +22,7 @@ export const ACENTOS: Record<string, string[]> = {
   a: ["á", "à", "â", "ã", "ä"], e: ["é", "è", "ê", "ë"], i: ["í", "ì", "î", "ï"],
   o: ["ó", "ò", "ô", "õ", "ö"], u: ["ú", "ù", "û", "ü"], c: ["ç"], n: ["ñ"],
 };
-export const TECLADO_ALTURA: Record<"baixa" | "media" | "alta", number> = { baixa: 44, media: 54, alta: 62 };
+export const TECLADO_ALTURA: Record<"baixa" | "media" | "alta", number> = { baixa: 38, media: 44, alta: 50 };
 
 export interface Edicao { texto: string; pos: number }
 

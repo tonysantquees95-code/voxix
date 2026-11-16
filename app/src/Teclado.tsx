@@ -16,12 +16,12 @@ interface Props {
 
 const RGB = ["#ff2a2a", "#2aff5a", "#2a6bff"];
 
-/** A luz que corre em volta do teclado: dois riscos (brancos, na cor do app) ou três riscos RGB. Só gira (transform): não pesa na digitação. */
-function gradienteDaLuz(efeito: Exclude<EfeitoToque, "nenhum">): string {
-  const risco = (p: number, cor: string, tam = 0.17) => `transparent ${p}turn, ${cor} ${p + tam}turn, transparent ${p + tam + 0.006}turn`;
-  if (efeito === "rgb") return `conic-gradient(${RGB.map((c, i) => risco(i / 3, c, 0.13)).join(", ")}, transparent 1turn)`;
-  const cor = efeito === "cor" ? "var(--color-neon)" : "#fff";
-  return `conic-gradient(${risco(0.02, cor)}, ${risco(0.52, cor)}, transparent 1turn)`;
+/** A luz que corre pelas bordas do teclado, no sentido do relógio. */
+function BordaLuz({ efeito }: { efeito: EfeitoToque }) {
+  if (efeito === "nenhum") return null;
+  const cor = (n: number) => (efeito === "brilho" ? "#fff" : efeito === "cor" ? "var(--color-neon)" : RGB[n % 3]);
+  const lados: [string, number, number][] = [["t", 90, 0], ["d", 180, 1], ["b", 270, 2], ["e", 0, 0]];
+  return <>{lados.map(([l, grau, n], k) => <div key={l} className={`borda-luz ${l}`} aria-hidden="true"><i style={{ backgroundImage: `linear-gradient(${grau}deg, transparent, ${cor(n)})`, animationDelay: `${-k * 0.75}s` }} /></div>)}</>;
 }
 
 /** Uma luz que corre no vão embaixo de uma fileira de teclas; as fileiras vão e voltam, uma em cada direção. */
@@ -71,13 +71,15 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   const [popup, setPopup] = useState<{ letra: string; opcoes: string[] } | null>(null);
   const [recentes, setRecentes] = useState<string[]>(lerRecentes);
   const segurou = useRef<number | null>(null);
+  const ultimaVibracao = useRef(0);
 
   useEffect(() => () => { if (segurou.current) window.clearTimeout(segurou.current); }, []);
 
   const maiuscula = shift !== "nao" || (inicioDeFrase && pagina === "letras");
 
   const acender = (_el: HTMLElement) => {
-    if (t.vibrar) window.setTimeout(() => { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }, 0);
+    const agora = performance.now();
+    if (t.vibrar && agora - ultimaVibracao.current > 35) { ultimaVibracao.current = agora; window.setTimeout(() => { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }, 0); }
   };
 
   const digitar = (s: string) => {
@@ -121,7 +123,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
 
   return (
     <div className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>
-      {t.efeito !== "nenhum" && <div className="teclado-luz" aria-hidden="true"><i style={{ backgroundImage: gradienteDaLuz(t.efeito) }} /></div>}
+      <BordaLuz efeito={t.efeito} />
       {pagina === "emojis" ? (
         <>
           <div className="mb-1 flex gap-1 overflow-x-auto rolagem pb-1" role="tablist" aria-label="Pacotes de emojis">

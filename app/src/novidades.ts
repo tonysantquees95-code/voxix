@@ -28,6 +28,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 21, data: "2026-11-16", tipo: "melhoria", titulo: "Apagar só apaga uma letra", texto: "Depois que o corretor troca uma palavra, apagar não desfaz mais a troca inteira: o botão de apagar tira uma letra por vez, como em qualquer teclado.", },
   { id: 22, data: "2026-11-16", tipo: "melhoria", titulo: "Teclas mais fáceis de acertar", texto: "O toque agora vale também no espacinho entre as teclas: antes, encostar no vão não digitava nada ou parecia errar a letra. Agora cada tecla aceita o toque até a metade do vão, como no teclado do celular.", },
   { id: 23, data: "2026-11-16", tipo: "novo", titulo: "Luzes correndo no teclado", texto: "Além da luz em volta do teclado, agora há luzes passando entre as fileiras de letras, cada fileira para um lado. Em Personalizar › Teclado você escolhe: desligadas, brancas, RGB ou na cor do app.", },
+  { id: 24, data: "2026-11-16", tipo: "melhoria", titulo: "Teclas mais quadradas e digitação mais rápida", texto: "As teclas ficaram mais largas em relação à altura, mais fáceis de acertar com o dedão. Ao tocar, a tecla só dá uma leve aumentada (sem acender), o que deixa o teclado mais leve para quem digita rápido. A luz em volta do teclado agora corre pelas quatro bordas. E se o corretor trocar uma palavra que você não queria, a faixa de sugestões mostra a original: toque nela para voltar (o Voxix aprende a deixar assim).", },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

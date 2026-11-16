@@ -55,26 +55,34 @@ button { cursor: pointer; }
 
 /* ---- teclado do Voxix ---- */
 .teclado { padding: 5px 3px calc(5px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--color-painel) 94%, var(--color-neon)); border-top: 1px solid var(--color-borda); user-select: none; -webkit-user-select: none; touch-action: manipulation; position: relative; }
-.linha-tecla { display: flex; gap: 7px; margin-bottom: 7px; position: relative; }
+.linha-tecla { display: flex; gap: 5px; margin-bottom: 6px; position: relative; }
 .tecla { --led: var(--color-neon); position: relative; height: var(--alt-tecla, 54px); min-width: 0; display: grid; place-items: center; font-size: 1.2rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); clip-path: var(--corte-tecla); -webkit-tap-highlight-color: transparent; touch-action: none; }
 .tecla-num { height: calc(var(--alt-tecla, 54px) * .74); font-size: 1.05rem; }
 .tecla-espaco { font-size: 1rem; color: var(--color-suave); }
 .dica { position: absolute; top: 2px; right: 5px; font-size: .62rem; font-weight: 500; line-height: 1; opacity: .55; pointer-events: none; }
 /* o toque também vale no espaço entre as teclas (sem "zona morta"): cada tecla estica a área de toque até a metade do vão */
-.tecla::before { content: ""; position: absolute; inset: -4px; }
+.tecla::before { content: ""; position: absolute; inset: -3px; }
 .linha-tecla > button.tecla:first-of-type::before { left: -8px; }
 .linha-tecla > button.tecla:last-of-type::before { right: -8px; }
-.tecla:active { background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
+.tecla { transition: transform 70ms ease-out; will-change: transform; }
+.tecla:active { transform: scale(1.07); background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); z-index: 2; }
 .tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
 .tecla-enviar { background: var(--color-neon); border-color: var(--color-neon); color: #fff; font-size: 1.15rem; }
-/* luz que corre em volta do teclado (como no logo): só um risco que gira por trás de uma moldura fina */
-.teclado-luz { position: absolute; inset: 0; padding: 3px; background: color-mix(in srgb, var(--color-neon) 14%, transparent); pointer-events: none; overflow: hidden; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
-.teclado-luz i { position: absolute; left: 50%; top: 50%; width: 760px; height: 760px; margin: -380px 0 0 -380px; animation: teclado-gira 4.2s linear infinite; will-change: transform; }
-@keyframes teclado-gira { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .teclado-luz i { animation: none; } }
+/* luzes que correm pelas quatro bordas do teclado, no sentido do relógio (só deslizam: nada de máscara nem camada grande) */
+.borda-luz { position: absolute; overflow: hidden; pointer-events: none; background: color-mix(in srgb, var(--color-neon) 10%, transparent); }
+.borda-luz i { position: absolute; will-change: transform; }
+.borda-luz.t { left: 0; right: 0; top: 0; height: 2px; } .borda-luz.b { left: 0; right: 0; bottom: 0; height: 2px; }
+.borda-luz.d { top: 0; bottom: 0; right: 0; width: 2px; } .borda-luz.e { top: 0; bottom: 0; left: 0; width: 2px; }
+.borda-luz.t i, .borda-luz.b i { top: 0; bottom: 0; width: 28%; }
+.borda-luz.d i, .borda-luz.e i { left: 0; right: 0; height: 28%; }
+.borda-luz.t i { animation: faixa-ida 3s linear infinite; } .borda-luz.b i { animation: faixa-volta 3s linear infinite; }
+.borda-luz.d i { animation: faixa-desce 3s linear infinite; } .borda-luz.e i { animation: faixa-sobe 3s linear infinite; }
+@keyframes faixa-desce { from { transform: translateY(-100%); } to { transform: translateY(360%); } }
+@keyframes faixa-sobe { from { transform: translateY(360%); } to { transform: translateY(-100%); } }
+@media (prefers-reduced-motion: reduce) { .borda-luz i { animation: none; } }
 /* luzes que correm no vão embaixo de cada fileira, cada uma para um lado */
-.faixa-luz { position: absolute; left: 0; right: 0; top: calc(100% + 2.5px); height: 2px; overflow: hidden; pointer-events: none; border-radius: 2px; background: color-mix(in srgb, var(--color-neon) 10%, transparent); }
+.faixa-luz { position: absolute; left: 0; right: 0; top: calc(100% + 2px); height: 2px; overflow: hidden; pointer-events: none; border-radius: 2px; background: color-mix(in srgb, var(--color-neon) 10%, transparent); }
 .faixa-luz i { position: absolute; left: 0; top: 0; bottom: 0; width: 28%; animation: faixa-ida 2.8s linear infinite; will-change: transform; }
 .faixa-luz i.volta { animation-name: faixa-volta; }
 @keyframes faixa-ida { from { transform: translateX(-100%); } to { transform: translateX(360%); } }

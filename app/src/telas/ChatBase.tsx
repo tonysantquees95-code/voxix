@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useDeferredValue, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ErroApi } from "../api";
 import { iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
@@ -8,7 +8,7 @@ import { Teclado } from "../Teclado";
 import { BarraSugestoes } from "../BarraSugestoes";
 import type { ReactNode } from "react";
 import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../edicaoTeclado";
-import { SEPARADORES, aplicarSeparador, corrigirFim, palavraAntesDoCursor, sugerir, trocarPalavra, type Correcao } from "../corretor";
+import { SEPARADORES, aplicarSeparador, corrigirFim, desfazerCorrecao, palavraAntesDoCursor, sugerir, trocarPalavra, type Correcao } from "../corretor";
 import { aprender, palavrasDaPessoa, useCorretor } from "../useCorretor";
 import { useVisual } from "../useVisual";
 
@@ -63,6 +63,8 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   const [cursor, setCursor] = useState(0);
   const textoRef = useRef("");
   const ultimaCorrecao = useRef<Correcao | null>(null);
+  const [desfazer, setDesfazer] = useState<Correcao | null>(null); // a troca automática mais recente: a faixa de sugestões oferece a palavra original
+  const marcar = (c: Correcao | null) => { ultimaCorrecao.current = c; setDesfazer(c); };
   const [aviso, setAviso] = useState("");
   const [menuAberto, setMenu] = useState(false);
   const [ouvindo, setOuvindo] = useState(false);
@@ -85,7 +87,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
 
   useEffect(() => { fim.current?.scrollIntoView({ block: "end" }); }, [mensagens.length, apelido]);
   useEffect(() => () => { void ditado.current?.parar(); }, [apelido]);
-  useEffect(() => { textoRef.current = ""; ultimaCorrecao.current = null; setTexto(""); setCursor(0); setAviso(""); setMenu(false); }, [apelido]);
+  useEffect(() => { textoRef.current = ""; marcar(null); setTexto(""); setCursor(0); setAviso(""); setMenu(false); }, [apelido]);
 
   // Depois que o texto novo entra no campo, o cursor vai para o lugar certo na mesma hora (sem esperar o próximo quadro:
   // quem digita rápido não pode ver letra caindo no lugar errado).
@@ -97,7 +99,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   });
 
   // O campo acompanha o que se escreve: cresce linha a linha até o limite e depois rola, sem esconder o texto.
-  useLayoutEffect(() => {
+  useEffect(() => { // depois de desenhar a letra (não trava o toque seguinte)
     const el = caixa.current;
     if (!el) return;
     // digitar sem quebrar linha não muda a altura: pula a medição pesada (só mede ao crescer ou ao apagar)
@@ -136,22 +138,27 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     const d = dicRef.current;
     if (d && SEPARADORES.has(x)) { // espaço, ponto, vírgula…: conserta a palavra que acabou de ser escrita
       const r = aplicarSeparador(d, palavrasDaPessoa(), t, i, j, x);
-      ultimaCorrecao.current = r.correcao;
+      marcar(r.correcao);
       aplicar(r);
       return;
     }
-    ultimaCorrecao.current = null;
+    marcar(null);
     aplicar(inserir(t, i, j, x));
   }, [aplicar, lerSelecao]);
   const apagarCaractere = useCallback(() => {
     const [i, j] = lerSelecao();
     const t = textoRef.current;
-    ultimaCorrecao.current = null; // apagar só apaga: a palavra corrigida não volta ao que estava
+    marcar(null); // apagar só apaga: a palavra corrigida não volta ao que estava
     aplicar(apagarTexto(t, i, j));
   }, [aplicar, lerSelecao]);
   const escolherSugestao = useCallback((palavra: string, literal: boolean) => {
     const [i] = lerSelecao();
-    ultimaCorrecao.current = null;
+    const c = ultimaCorrecao.current;
+    marcar(null);
+    if (c && literal && palavra === c.original) { // tocou na palavra original logo depois da troca: desfaz e o corretor aprende a deixar assim
+      const r = desfazerCorrecao(textoRef.current, i, c);
+      if (r) { aprender(c.original); aplicar(r); return; }
+    }
     if (literal) aprender(palavra); // tocar na palavra como foi escrita: o corretor aprende a deixar assim
     aplicar(trocarPalavra(textoRef.current, i, palavra));
   }, [aplicar, lerSelecao]);
@@ -163,21 +170,24 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     const t = e.currentTarget.value;
     const i = e.currentTarget.selectionStart;
     const j = e.currentTarget.selectionEnd;
-    if (e.key === "Backspace") ultimaCorrecao.current = null;
+    if (e.key === "Backspace") marcar(null);
     const sep = e.key === "Enter" ? "\n" : e.key;
     if (sep.length === 1 && SEPARADORES.has(sep)) {
       const r = aplicarSeparador(d, palavrasDaPessoa(), t, i, j, sep);
-      ultimaCorrecao.current = r.correcao;
+      marcar(r.correcao);
       if (r.correcao) { e.preventDefault(); aplicar(r); }
     }
   };
 
-  const palavra = useMemo(() => (dic ? palavraAntesDoCursor(texto, cursor) : null), [dic, texto, cursor]);
+  // as sugestões podem chegar um quadro depois: a letra digitada nunca espera por elas
+  const textoSug = useDeferredValue(texto);
+  const cursorSug = useDeferredValue(cursor);
+  const palavra = useMemo(() => (dic ? palavraAntesDoCursor(textoSug, cursorSug) : null), [dic, textoSug, cursorSug]);
   const sugestoes = useMemo(() => {
     if (!dic || !palavra || !palavra.palavra || /[\d@#_/\\:]/.test(palavra.trecho)) return null;
     return sugerir(dic, palavra.palavra, palavrasDaPessoa());
   }, [dic, palavra]);
-  const literal = sugestoes && !sugestoes.valida && palavra ? palavra.palavra : null;
+  const literal = (sugestoes && !sugestoes.valida && palavra ? palavra.palavra : null) ?? (desfazer && !palavra?.palavra ? desfazer.original : null);
   const opcoes = sugestoes?.opcoes ?? SEM_OPCOES;
 
   const mandarRef = useRef<() => Promise<void>>(async () => {});
@@ -194,7 +204,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     if (dicRef.current) t = corrigirFim(dicRef.current, palavrasDaPessoa(), t).trim(); // conserta também a última palavra
     if (ouvindo) await ditado.current?.parar();
     textoRef.current = "";
-    ultimaCorrecao.current = null;
+    marcar(null);
     setTexto("");
     setCursor(0);
     setAviso("");
@@ -252,7 +262,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
         {corretorLigado && !proprio && tecladoFisico && <BarraSugestoes flutuante literal={literal} opcoes={opcoes} aoEscolher={escolherSugestao} />}
         <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome="microfone" tam={22} /></button>
         <textarea ref={caixa} inputMode={proprio ? "none" : undefined} onFocus={() => setTecladoAberto(true)} onClick={() => setTecladoAberto(true)} value={texto}
-          onChange={(e) => { ultimaCorrecao.current = null; textoRef.current = e.target.value; setTexto(e.target.value); setCursor(e.target.selectionStart ?? e.target.value.length); }}
+          onChange={(e) => { marcar(null); textoRef.current = e.target.value; setTexto(e.target.value); setCursor(e.target.selectionStart ?? e.target.value.length); }}
           onSelect={(e) => setCursor(e.currentTarget.selectionStart ?? 0)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); return; } aoTeclar(e); }}
           rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} lang="pt-BR" autoCapitalize="sentences" autoCorrect={proprio ? "off" : "on"} spellCheck={!proprio && !(corretorLigado && tecladoFisico)}

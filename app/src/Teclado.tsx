@@ -78,6 +78,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   const maiuscula = shift !== "nao" || (inicioDeFrase && pagina === "letras");
 
   const acender = (_el: HTMLElement) => {
+    setPopup((p) => (p ? null : p)); // qualquer outra tecla fecha a janelinha de acentos
     const agora = performance.now();
     if (t.vibrar && agora - ultimaVibracao.current > 35) { ultimaVibracao.current = agora; window.setTimeout(() => { try { navigator.vibrate?.(8); } catch { /* sem vibração */ } }, 0); }
   };
@@ -103,10 +104,10 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
     if (acentos.length) {
       // segurar abre as variações (o símbolo pequeno da tecla vem junto); a escolhida troca a letra já escrita
       const opcoes = [...(dica ? [dica] : []), ...acentos].map((o) => (maiuscula ? o.toUpperCase() : o));
-      segurou.current = window.setTimeout(() => setPopup({ letra, opcoes }), 380);
+      segurou.current = window.setTimeout(() => setPopup({ letra, opcoes }), 450);
     } else if (dica) {
       // como no teclado do celular: segurar uma letra sem acento digita o símbolo pequeno dela
-      segurou.current = window.setTimeout(() => { aoApagar(); aoInserir(dica); }, 380);
+      segurou.current = window.setTimeout(() => { aoApagar(); aoInserir(dica); }, 450);
     }
   };
   const escolherAcento = (o: string) => { aoApagar(); aoInserir(o); setPopup(null); };

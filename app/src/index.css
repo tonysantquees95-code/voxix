@@ -60,6 +60,10 @@ button { cursor: pointer; }
 .tecla-num { height: calc(var(--alt-tecla, 54px) * .74); font-size: 1.05rem; }
 .tecla-espaco { font-size: 1rem; color: var(--color-suave); }
 .dica { position: absolute; top: 2px; right: 5px; font-size: .62rem; font-weight: 500; line-height: 1; opacity: .55; pointer-events: none; }
+/* o toque também vale no espaço entre as teclas (sem "zona morta"): cada tecla estica a área de toque até a metade do vão */
+.tecla::before { content: ""; position: absolute; inset: -4px; }
+.linha-tecla > .tecla:first-child::before { left: -8px; }
+.linha-tecla > .tecla:last-child::before { right: -8px; }
 .tecla:active { background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
 .tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }

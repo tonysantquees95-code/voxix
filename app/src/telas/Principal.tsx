@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { lista, totalNaoLidas } from "../armazem";
 import { BUILD, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
@@ -8,6 +8,8 @@ import { PapelDeParede } from "../papel";
 import { Ajustes } from "./Ajustes";
 import { Conversa } from "./Conversa";
 import { NovaConversa } from "./NovaConversa";
+import { Comunidade } from "./Comunidade";
+import { ListaComunidades } from "./Comunidades";
 
 const hora = (t: number): string => {
   const d = new Date(t);
@@ -18,12 +20,21 @@ const hora = (t: number): string => {
 export function Principal() {
   const { armazem, aberta, abrir, conexao, perfil } = useVoxix();
   const [painel, setPainel] = useState<"nova" | "ajustes" | null>(null);
+  const [aba, setAba] = useState<"conversas" | "comunidades">("conversas");
+  const [comAberta, setComAberta] = useState<string | null>(null);
+  const [versaoCom, setVersaoCom] = useState(0);
+  const recarregarCom = useCallback(() => setVersaoCom((n) => n + 1), []);
+  const fecharCom = useCallback(() => setComAberta(null), []);
+  const algoAberto = !!aberta || !!comAberta;
+  useEffect(() => { if (aberta) setComAberta(null); }, [aberta]);
+  const abrirConversa = (a: string) => { setComAberta(null); abrir(a); };
+  const abrirCom = (id: string) => { abrir(null); setAba("comunidades"); setComAberta(id); };
   const conversas = lista(armazem);
   const naoLidas = totalNaoLidas(armazem);
 
   return (
     <div className="grid h-full md:grid-cols-[340px_1fr]">
-      <aside className={`${aberta ? "hidden md:flex" : "flex"} relative min-h-0 flex-col overflow-hidden border-r border-borda bg-painel`}>
+      <aside className={`${algoAberto ? "hidden md:flex" : "flex"} relative min-h-0 flex-col overflow-hidden border-r border-borda bg-painel`}>
         <PapelDeParede qual="inicio" />
         <header className="relative z-[1] flex items-center gap-3 px-4 py-3">
           <Logo tam={32} />
@@ -35,12 +46,18 @@ export function Principal() {
           <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="botao-redondo grid h-9 w-9 place-items-center border border-borda text-lg"><Icone nome="config" tam={20} /></button>
         </header>
         <div className="relative z-[1]"><Aviso /></div>
+        <div className="relative z-[1] mx-4 mb-2 grid grid-cols-2 gap-2" role="tablist">
+          {([["conversas", "Conversas", "enviar"], ["comunidades", "Comunidades", "grupo"]] as const).map(([id, rot, ico]) => (
+            <button key={id} role="tab" aria-selected={aba === id} onClick={() => setAba(id)} className={`flex items-center justify-center gap-1.5 rounded-xl border py-1.5 text-sm font-bold ${aba === id ? "border-neon bg-neon/15 text-neon" : "border-borda text-suave"}`}><Icone nome={ico} tam={16} />{rot}</button>
+          ))}
+        </div>
         <div className="rolagem relative z-[1] min-h-0 flex-1 overflow-y-auto">
-          {conversas.length === 0 && <p className="px-6 py-10 text-center text-sm text-suave">Nenhuma conversa ainda. Toque no <b className="text-neon">+</b> e procure um amigo pelo apelido.</p>}
-          {conversas.map((c) => {
+          {aba === "comunidades" && <ListaComunidades atual={comAberta} aoAbrir={abrirCom} versao={versaoCom} />}
+          {aba === "conversas" && conversas.length === 0 && <p className="px-6 py-10 text-center text-sm text-suave">Nenhuma conversa ainda. Toque no <b className="text-neon">+</b> e procure um amigo pelo apelido.</p>}
+          {aba === "conversas" && conversas.map((c) => {
             const ult = c.mensagens[c.mensagens.length - 1];
             return (
-              <button key={c.apelido} onClick={() => abrir(c.apelido)} className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${aberta === c.apelido ? "bg-white/10" : ""}`}>
+              <button key={c.apelido} onClick={() => abrirConversa(c.apelido)} className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${aberta === c.apelido ? "bg-white/10" : ""}`}>
                 <span className="avatar grid h-11 w-11 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{c.nome.slice(0, 1).toUpperCase()}</span>
                 <span className="min-w-0 flex-1">
                   <span className="flex justify-between gap-2"><b className="truncate">{c.nome}</b><span className="flex-none text-xs text-suave">{ult ? hora(ult.criado) : ""}</span></span>
@@ -51,9 +68,9 @@ export function Principal() {
           })}
         </div>
       </aside>
-      <main className={`${aberta ? "flex" : "hidden md:flex"} relative min-h-0 flex-col`}>
-        {!aberta && <PapelDeParede qual="inicio" />}
-        {aberta ? <Conversa apelido={aberta} /> : <div className="relative z-[1] m-auto text-center text-suave"><Logo tam={72} className="mx-auto mb-3" /><p>Escolha uma conversa</p></div>}
+      <main className={`${algoAberto ? "flex" : "hidden md:flex"} relative min-h-0 flex-col`}>
+        {!algoAberto && <PapelDeParede qual="inicio" />}
+        {comAberta ? <Comunidade id={comAberta} aoVoltar={fecharCom} aoMudou={recarregarCom} aoSumir={fecharCom} /> : aberta ? <Conversa apelido={aberta} /> : <div className="relative z-[1] m-auto text-center text-suave"><Logo tam={72} className="mx-auto mb-3" /><p>Escolha uma conversa ou uma comunidade</p></div>}
       </main>
       {painel === "nova" && <NovaConversa fechar={() => setPainel(null)} />}
       {painel === "ajustes" && <Ajustes fechar={() => setPainel(null)} />}

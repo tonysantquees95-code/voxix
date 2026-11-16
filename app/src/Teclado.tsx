@@ -120,7 +120,10 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
   };
 
   const linhas = pagina === "numeros" ? NUMEROS : LETRAS;
-  const alt = TECLADO_ALTURA[t.altura];
+  const base = TECLADO_ALTURA[t.altura];
+  // a página de números não tem a fileira de números do alto (0,74 da tecla): as teclas dela crescem para o teclado
+  // ocupar exatamente a mesma altura da página de letras (4,74 teclas + 5 vãos de 6px contra 4 teclas + 4 vãos)
+  const alt = pagina === "numeros" ? Math.round((base * 4.74 + 6) / 4 * 10) / 10 : base;
 
   return (
     <div className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>

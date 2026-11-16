@@ -251,7 +251,7 @@ function AbaTeclado() {
     <div className="space-y-4">
       <Interruptor ligado={t.usar} aoMudar={(x) => mudarTeclado({ usar: x })} titulo="Usar o teclado do Voxix" dica="Só dele, no mesmo estilo do app. Desligado, vale o teclado do aparelho." />
       <Interruptor ligado={t.noPc} aoMudar={(x) => mudarTeclado({ noPc: x })} titulo="Mostrar também no computador" dica="Normalmente ele aparece só em telas de toque." />
-      <Interruptor ligado={t.corretor} aoMudar={(x) => mudarTeclado({ corretor: x })} titulo="Corretor automático em português" dica="Sugere palavras em cima do teclado e corrige acentos e erros ao dar espaço. Apagar logo depois desfaz a troca. Funciona no celular e no computador." />
+      <Interruptor ligado={t.corretor} aoMudar={(x) => mudarTeclado({ corretor: x })} titulo="Corretor automático em português" dica="Sugere palavras em cima do teclado e corrige acentos e erros ao dar espaço. Funciona no celular e no computador." />
       <div>
         <p className="mb-1 text-xs text-suave">Formato das teclas</p>
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Formato das teclas">{formas.map((f) => <Chip key={f.id} cheio ativo={t.forma === f.id} onClick={() => mudarTeclado({ forma: f.id })}>{f.nome}</Chip>)}</div>

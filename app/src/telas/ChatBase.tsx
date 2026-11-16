@@ -8,7 +8,7 @@ import { Teclado } from "../Teclado";
 import { BarraSugestoes } from "../BarraSugestoes";
 import type { ReactNode } from "react";
 import { apagar as apagarTexto, comecaFrase, inserir, type Edicao } from "../edicaoTeclado";
-import { SEPARADORES, aplicarSeparador, corrigirFim, desfazerCorrecao, palavraAntesDoCursor, sugerir, trocarPalavra, type Correcao } from "../corretor";
+import { SEPARADORES, aplicarSeparador, corrigirFim, palavraAntesDoCursor, sugerir, trocarPalavra, type Correcao } from "../corretor";
 import { aprender, palavrasDaPessoa, useCorretor } from "../useCorretor";
 import { useVisual } from "../useVisual";
 
@@ -146,12 +146,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   const apagarCaractere = useCallback(() => {
     const [i, j] = lerSelecao();
     const t = textoRef.current;
-    const c = ultimaCorrecao.current;
-    if (c && i === j) { // apagar logo depois de uma troca automática devolve a palavra como estava
-      const r = desfazerCorrecao(t, i, c);
-      if (r) { aprender(c.original); ultimaCorrecao.current = null; aplicar(r); return; }
-    }
-    ultimaCorrecao.current = null;
+    ultimaCorrecao.current = null; // apagar só apaga: a palavra corrigida não volta ao que estava
     aplicar(apagarTexto(t, i, j));
   }, [aplicar, lerSelecao]);
   const escolherSugestao = useCallback((palavra: string, literal: boolean) => {
@@ -168,10 +163,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     const t = e.currentTarget.value;
     const i = e.currentTarget.selectionStart;
     const j = e.currentTarget.selectionEnd;
-    if (e.key === "Backspace" && ultimaCorrecao.current && i === j) {
-      const r = desfazerCorrecao(t, i, ultimaCorrecao.current);
-      if (r) { e.preventDefault(); aprender(ultimaCorrecao.current.original); ultimaCorrecao.current = null; aplicar(r); return; }
-    }
+    if (e.key === "Backspace") ultimaCorrecao.current = null;
     const sep = e.key === "Enter" ? "\n" : e.key;
     if (sep.length === 1 && SEPARADORES.has(sep)) {
       const r = aplicarSeparador(d, palavrasDaPessoa(), t, i, j, sep);

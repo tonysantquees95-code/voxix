@@ -56,13 +56,12 @@ button { cursor: pointer; }
 /* ---- teclado do Voxix ---- */
 .teclado { padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); background: color-mix(in srgb, var(--color-painel) 94%, var(--color-neon)); border-top: 1px solid var(--color-borda); user-select: none; -webkit-user-select: none; touch-action: manipulation; position: relative; }
 .linha-tecla { display: flex; gap: 5px; margin-bottom: 5px; }
-.tecla { --led: var(--color-neon); height: var(--alt-tecla, 46px); min-width: 0; display: grid; place-items: center; font-size: 1.05rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); clip-path: var(--corte-tecla); transition: transform .08s; -webkit-tap-highlight-color: transparent; }
-.tecla:active { transform: scale(.93); }
-.tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: .95rem; }
+.tecla { --led: var(--color-neon); position: relative; height: var(--alt-tecla, 54px); min-width: 0; display: grid; place-items: center; font-size: 1.2rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); clip-path: var(--corte-tecla); -webkit-tap-highlight-color: transparent; touch-action: none; }
+.tecla:active { background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
+.tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
 .tecla-enviar { background: var(--color-neon); border-color: var(--color-neon); color: #fff; font-size: 1.15rem; }
-.tecla.tocou { animation: led-tecla .45s ease-out; }
-@keyframes led-tecla { 0% { box-shadow: 0 0 0 0 var(--led), 0 0 18px 4px var(--led); border-color: var(--led); background: color-mix(in srgb, var(--led) 35%, var(--color-painel)); } 100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; } }
+.tecla::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in srgb, var(--led) 38%, transparent); box-shadow: inset 0 0 0 1.5px var(--led), 0 0 14px 2px var(--led); }
 .popup-acento { position: absolute; left: 6px; right: 6px; top: -52px; display: flex; gap: 4px; padding: 6px; background: var(--color-painel); border: 1px solid var(--color-neon); border-radius: var(--r-balao); z-index: 5; }
 .popup-acento button { flex: 1; height: 38px; font-size: 1.15rem; border-radius: var(--r-tecla); background: color-mix(in srgb, var(--color-neon) 20%, transparent); color: var(--color-texto); }
 .pacote { flex: none; width: 38px; height: 34px; font-size: 1.2rem; border-radius: var(--r-tecla); border: 1px solid transparent; }
@@ -70,4 +69,14 @@ button { cursor: pointer; }
 .grade-emoji { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; overflow-y: auto; margin-bottom: 5px; }
 .emoji { height: 40px; font-size: 1.5rem; border-radius: var(--r-tecla); }
 .emoji:active { background: color-mix(in srgb, var(--color-neon) 25%, transparent); }
-@media (prefers-reduced-motion: reduce) { .tecla.tocou { animation: none; } }
+
+/* ---- faixa de sugestões do corretor (em cima das teclas; no computador, flutuando em cima do campo) ---- */
+.barra-sug { display: flex; gap: 5px; height: 42px; padding: 5px 6px 0; background: color-mix(in srgb, var(--color-painel) 94%, var(--color-neon)); border-top: 1px solid var(--color-borda); }
+.barra-sug + .teclado { border-top: 0; padding-top: 5px; }
+.sug { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; font-size: 1.05rem; font-weight: 600; color: var(--color-texto); background: color-mix(in srgb, var(--color-painel) 70%, #fff 8%); border: 1px solid var(--color-borda); border-radius: var(--r-tecla); clip-path: var(--corte-tecla); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.sug:active { background: color-mix(in srgb, var(--color-neon) 25%, var(--color-painel)); }
+.sug-melhor { border-color: var(--color-neon); color: var(--color-neon); }
+.sug-literal { font-style: italic; color: var(--color-suave); }
+.barra-sug-flutuante { position: absolute; left: .625rem; right: .625rem; bottom: 100%; z-index: 5; height: 38px; padding: 0 0 5px; background: transparent; border-top: 0; }
+.barra-sug-flutuante { justify-content: flex-start; }
+.barra-sug-flutuante .sug { flex: 0 1 auto; min-width: 7rem; background: var(--color-painel); }

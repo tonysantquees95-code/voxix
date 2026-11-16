@@ -52,8 +52,9 @@ export interface Teclado {
   ledCor: string;           // usada quando led === "cor"
   vibrar: boolean;
   altura: AlturaTeclado;
+  corretor: boolean;        // sugere e corrige palavras em português enquanto escreve
 }
-export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "led", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media" };
+export const TECLADO_PADRAO: Teclado = { usar: true, noPc: false, forma: "redonda", efeito: "led", led: "tema", ledCor: "#19e3ff", vibrar: true, altura: "media", corretor: true };
 
 /** Desenho dos ícones do app (engrenagem, enviar, microfone…): espessura do traço, tamanho, estilo e cor. */
 export type Traco = "fino" | "medio" | "grosso";
@@ -116,6 +117,7 @@ export function limparTeclado(v: unknown): Teclado {
     ledCor: hexValido(o.ledCor) ? o.ledCor : TECLADO_PADRAO.ledCor,
     vibrar: b(o.vibrar, TECLADO_PADRAO.vibrar),
     altura: um(["baixa", "media", "alta"] as const, o.altura, TECLADO_PADRAO.altura),
+    corretor: b(o.corretor, TECLADO_PADRAO.corretor),
   };
 }
 

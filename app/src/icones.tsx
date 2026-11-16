@@ -3,7 +3,7 @@ import { useVisual } from "./useVisual";
 
 export type NomeIcone =
   | "config" | "fechar" | "voltar" | "mais" | "adicionar" | "enviar" | "microfone" | "inicio" | "teclado" | "cores" | "formato" | "fundo"
-  | "emoji" | "apagar" | "shift" | "shiftTrava" | "estrela" | "seta";
+  | "emoji" | "apagar" | "enter" | "shift" | "shiftTrava" | "estrela" | "seta";
 
 /** Engrenagem de 8 dentes, gerada em código (centro 12,12). */
 function engrenagem(): string {
@@ -37,6 +37,7 @@ const DESENHOS: Record<NomeIcone, { area?: string; linhas?: string; pontos?: [nu
   fundo: { area: "M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z", linhas: "M3 17l5-5 4 4 3-3 6 6M9 9.5h.01" },
   emoji: { area: "M12 3a9 9 0 100 18 9 9 0 000-18z", linhas: "M8.5 14a4 4 0 007 0M9 10h.01M15 10h.01" },
   apagar: { area: "M21 5H9l-6 7 6 7h12z", linhas: "M13 9.5l5 5M18 9.5l-5 5" },
+  enter: { linhas: "M19 6v6a2 2 0 01-2 2H6M10 9.5L5.5 14l4.5 4.5" },
   shift: { area: "M12 4l8 9h-5v7H9v-7H4z" },
   shiftTrava: { area: "M12 3l8 8.5h-5V16H9v-4.5H4z", linhas: "M9 20h6" },
   estrela: { area: "M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.5 2.9 1-6.1L3 9.5l6.1-.9z" },

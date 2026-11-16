@@ -5,6 +5,6 @@ import { defineConfig } from "vite";
 export default defineConfig({
   base: "./",
   plugins: [react(), tailwindcss()],
-  build: { outDir: "dist", target: "es2020" },
+  build: { outDir: "dist", target: "es2020", chunkSizeWarningLimit: 700 }, // o dicionário do corretor é um pedaço à parte, carregado só ao abrir uma conversa
   server: { port: 5178, strictPort: true, host: true }
 });

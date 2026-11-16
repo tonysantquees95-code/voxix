@@ -27,6 +27,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 20, data: "2026-11-16", tipo: "melhoria", titulo: "Teclado mais espaçado, com luz em volta e correção que acerta", texto: "As teclas ficaram mais afastadas umas das outras e mais perto das bordas. Em vez de acender cada tecla, uma luz branca corre em volta do teclado, como no logo (dá para trocar ou desligar em Personalizar › Teclado). E o corretor foi consertado: agora ele sugere e troca de verdade palavras como “vebdo” por “vendo” e “Testanndo” por “Testando” ao dar espaço.", },
   { id: 21, data: "2026-11-16", tipo: "melhoria", titulo: "Apagar só apaga uma letra", texto: "Depois que o corretor troca uma palavra, apagar não desfaz mais a troca inteira: o botão de apagar tira uma letra por vez, como em qualquer teclado.", },
   { id: 22, data: "2026-11-16", tipo: "melhoria", titulo: "Teclas mais fáceis de acertar", texto: "O toque agora vale também no espacinho entre as teclas: antes, encostar no vão não digitava nada ou parecia errar a letra. Agora cada tecla aceita o toque até a metade do vão, como no teclado do celular.", },
+  { id: 23, data: "2026-11-16", tipo: "novo", titulo: "Luzes correndo no teclado", texto: "Além da luz em volta do teclado, agora há luzes passando entre as fileiras de letras, cada fileira para um lado. Em Personalizar › Teclado você escolhe: desligadas, brancas, RGB ou na cor do app.", },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

@@ -62,8 +62,8 @@ button { cursor: pointer; }
 .dica { position: absolute; top: 2px; right: 5px; font-size: .62rem; font-weight: 500; line-height: 1; opacity: .55; pointer-events: none; }
 /* o toque também vale no espaço entre as teclas (sem "zona morta"): cada tecla estica a área de toque até a metade do vão */
 .tecla::before { content: ""; position: absolute; inset: -4px; }
-.linha-tecla > .tecla:first-child::before { left: -8px; }
-.linha-tecla > .tecla:last-child::before { right: -8px; }
+.linha-tecla > button.tecla:first-of-type::before { left: -8px; }
+.linha-tecla > button.tecla:last-of-type::before { right: -8px; }
 .tecla:active { background: color-mix(in srgb, var(--color-neon) 22%, var(--color-painel)); }
 .tecla-fn { background: color-mix(in srgb, var(--color-painel) 85%, var(--color-magenta) 15%); font-size: 1rem; }
 .tecla[data-ativa="sim"] { border-color: var(--color-neon); color: var(--color-neon); }
@@ -73,6 +73,13 @@ button { cursor: pointer; }
 .teclado-luz i { position: absolute; left: 50%; top: 50%; width: 760px; height: 760px; margin: -380px 0 0 -380px; animation: teclado-gira 4.2s linear infinite; will-change: transform; }
 @keyframes teclado-gira { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .teclado-luz i { animation: none; } }
+/* luzes que correm no vão embaixo de cada fileira, cada uma para um lado */
+.faixa-luz { position: absolute; left: 0; right: 0; top: calc(100% + 2.5px); height: 2px; overflow: hidden; pointer-events: none; border-radius: 2px; background: color-mix(in srgb, var(--color-neon) 10%, transparent); }
+.faixa-luz i { position: absolute; left: 0; top: 0; bottom: 0; width: 28%; animation: faixa-ida 2.8s linear infinite; will-change: transform; }
+.faixa-luz i.volta { animation-name: faixa-volta; }
+@keyframes faixa-ida { from { transform: translateX(-100%); } to { transform: translateX(360%); } }
+@keyframes faixa-volta { from { transform: translateX(360%); } to { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) { .faixa-luz i { animation: none; } }
 .popup-acento { position: absolute; left: 6px; right: 6px; top: -52px; display: flex; gap: 4px; padding: 6px; background: var(--color-painel); border: 1px solid var(--color-neon); border-radius: var(--r-balao); z-index: 5; }
 .popup-acento button { flex: 1; height: 38px; font-size: 1.15rem; border-radius: var(--r-tecla); background: color-mix(in srgb, var(--color-neon) 20%, transparent); color: var(--color-texto); }
 .pacote { flex: none; width: 38px; height: 34px; font-size: 1.2rem; border-radius: var(--r-tecla); border: 1px solid transparent; }

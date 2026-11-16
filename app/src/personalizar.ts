@@ -40,7 +40,7 @@ export const PAPEL_PADRAO: Papel = { modelo: "nenhum", escurecer: 35 };
 
 /** Teclado próprio do Voxix. */
 export type FormaTecla = "redonda" | "quadrada" | "futurista";
-export type EfeitoToque = "nenhum" | "brilho" | "logo"; // luz que corre em volta do teclado: desligada, branca, ou como a do logo
+export type EfeitoToque = "nenhum" | "brilho" | "rgb" | "cor"; // luzes que correm no teclado: desligadas, brancas, RGB, ou na cor do app
 export type CorLed = "tema" | "arco" | "cor";
 export type AlturaTeclado = "baixa" | "media" | "alta";
 export interface Teclado {
@@ -112,7 +112,7 @@ export function limparTeclado(v: unknown): Teclado {
   return {
     usar: b(o.usar, TECLADO_PADRAO.usar), noPc: b(o.noPc, TECLADO_PADRAO.noPc),
     forma: um(["redonda", "quadrada", "futurista"] as const, o.forma, TECLADO_PADRAO.forma),
-    efeito: um(["nenhum", "brilho", "logo"] as const, o.efeito, TECLADO_PADRAO.efeito),
+    efeito: um(["nenhum", "brilho", "rgb", "cor"] as const, o.efeito, TECLADO_PADRAO.efeito),
     led: um(["tema", "arco", "cor"] as const, o.led, TECLADO_PADRAO.led),
     ledCor: hexValido(o.ledCor) ? o.ledCor : TECLADO_PADRAO.ledCor,
     vibrar: b(o.vibrar, TECLADO_PADRAO.vibrar),

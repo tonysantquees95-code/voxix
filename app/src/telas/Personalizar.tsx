@@ -246,7 +246,7 @@ function AbaTeclado() {
   const t = v.teclado;
   const [prova, setProva] = useState("");
   const formas: { id: FormaTecla; nome: string }[] = [{ id: "redonda", nome: "Redondinho" }, { id: "quadrada", nome: "Quadradinho" }, { id: "futurista", nome: "Futurista" }];
-  const efeitos: { id: EfeitoToque; nome: string }[] = [{ id: "nenhum", nome: "Desligada" }, { id: "brilho", nome: "Branca" }, { id: "logo", nome: "Como o logo" }];
+  const efeitos: { id: EfeitoToque; nome: string }[] = [{ id: "nenhum", nome: "Desligadas" }, { id: "brilho", nome: "Brancas" }, { id: "rgb", nome: "RGB" }, { id: "cor", nome: "Cor do app" }];
   return (
     <div className="space-y-4">
       <Interruptor ligado={t.usar} aoMudar={(x) => mudarTeclado({ usar: x })} titulo="Usar o teclado do Voxix" dica="Só dele, no mesmo estilo do app. Desligado, vale o teclado do aparelho." />
@@ -257,8 +257,8 @@ function AbaTeclado() {
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Formato das teclas">{formas.map((f) => <Chip key={f.id} cheio ativo={t.forma === f.id} onClick={() => mudarTeclado({ forma: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       <div>
-        <p className="mb-1 text-xs text-suave">Luz em volta do teclado</p>
-        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Luz em volta do teclado">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
+        <p className="mb-1 text-xs text-suave">Luzes que correm no teclado</p>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Luzes do teclado">{efeitos.map((f) => <Chip key={f.id} cheio ativo={t.efeito === f.id} onClick={() => mudarTeclado({ efeito: f.id })}>{f.nome}</Chip>)}</div>
       </div>
       <Interruptor ligado={t.vibrar} aoMudar={(x) => mudarTeclado({ vibrar: x })} titulo="Vibrar ao tocar" dica="Uma batidinha leve em cada tecla." />
       <div>

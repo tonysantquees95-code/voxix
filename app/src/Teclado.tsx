@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Icone } from "./icones";
 import { PACOTES, RECENTES_ID, guardarRecentes, lerRecentes, somarRecente } from "./emojis";
-import { mudarVisual } from "./personalizar";
+import { mudarVisual, type EfeitoToque } from "./personalizar";
 import { ACENTOS, DICAS, LETRAS, LINHA_NUMEROS, NUMEROS, TECLADO_ALTURA } from "./edicaoTeclado";
 import { useVisual } from "./useVisual";
 
@@ -14,12 +14,22 @@ interface Props {
   podeEnviar: boolean;
 }
 
-/** A luz que corre em volta do teclado: dois riscos brancos, ou as cores do logo (RGB ou uma cor só). Só gira (transform): não pesa na digitação. */
-function gradienteDaLuz(efeito: "brilho" | "logo", luz: { modo: string; cor: string }): string {
+const RGB = ["#ff2a2a", "#2aff5a", "#2a6bff"];
+
+/** A luz que corre em volta do teclado: dois riscos (brancos, na cor do app) ou três riscos RGB. Só gira (transform): não pesa na digitação. */
+function gradienteDaLuz(efeito: Exclude<EfeitoToque, "nenhum">): string {
   const risco = (p: number, cor: string, tam = 0.17) => `transparent ${p}turn, ${cor} ${p + tam}turn, transparent ${p + tam + 0.006}turn`;
-  if (efeito === "brilho" || luz.modo === "branca") return `conic-gradient(${risco(0.02, "#fff")}, ${risco(0.52, "#fff")}, transparent 1turn)`;
-  if (luz.modo === "cor") return `conic-gradient(${risco(0.02, luz.cor)}, ${risco(0.52, luz.cor)}, transparent 1turn)`;
-  return `conic-gradient(${risco(0.0, "#ff2a2a", 0.13)}, ${risco(0.33, "#2aff5a", 0.13)}, ${risco(0.66, "#2a6bff", 0.13)}, transparent 1turn)`;
+  if (efeito === "rgb") return `conic-gradient(${RGB.map((c, i) => risco(i / 3, c, 0.13)).join(", ")}, transparent 1turn)`;
+  const cor = efeito === "cor" ? "var(--color-neon)" : "#fff";
+  return `conic-gradient(${risco(0.02, cor)}, ${risco(0.52, cor)}, transparent 1turn)`;
+}
+
+/** Uma luz que corre no vão embaixo de uma fileira de teclas; as fileiras vão e voltam, uma em cada direção. */
+function Faixa({ n, efeito }: { n: number; efeito: EfeitoToque }) {
+  if (efeito === "nenhum") return null;
+  const cor = efeito === "brilho" ? "#fff" : efeito === "cor" ? "var(--color-neon)" : RGB[n % 3];
+  const volta = n % 2 === 1;
+  return <div className="faixa-luz" aria-hidden="true"><i className={volta ? "volta" : ""} style={{ backgroundImage: `linear-gradient(${volta ? 270 : 90}deg, transparent, ${cor})`, animationDelay: `${-n * 0.7}s` }} /></div>;
 }
 
 interface TeclaProps { children: ReactNode; onPress: () => void; acender: (el: HTMLElement) => void; larga?: number; ativa?: boolean; rotulo: string; classe?: string; repetir?: boolean; aoSoltar?: boolean }
@@ -111,7 +121,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
 
   return (
     <div className="teclado" style={{ "--alt-tecla": `${alt}px` } as CSSProperties} role="group" aria-label="Teclado do Voxix" onContextMenu={(e) => e.preventDefault()}>
-      {t.efeito !== "nenhum" && <div className="teclado-luz" aria-hidden="true"><i style={{ backgroundImage: gradienteDaLuz(t.efeito, v.luz) }} /></div>}
+      {t.efeito !== "nenhum" && <div className="teclado-luz" aria-hidden="true"><i style={{ backgroundImage: gradienteDaLuz(t.efeito) }} /></div>}
       {pagina === "emojis" ? (
         <>
           <div className="mb-1 flex gap-1 overflow-x-auto rolagem pb-1" role="tablist" aria-label="Pacotes de emojis">
@@ -145,6 +155,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
           {pagina === "letras" && (
             <div className="linha-tecla">
               {LINHA_NUMEROS.map((n) => <Tecla key={n} acender={acender} rotulo={n} onPress={() => digitar(n)} classe="tecla-num">{n}</Tecla>)}
+              <Faixa n={0} efeito={t.efeito} />
             </div>
           )}
           {linhas.map((l, i) => (
@@ -162,6 +173,7 @@ export const Teclado = memo(function Teclado({ aoInserir, aoApagar, aoEnviar, in
                 ) : <Tecla key={ch} acender={acender} rotulo={ch} onPress={() => digitar(ch)}>{ch}</Tecla>
               ))}
               {i === 2 && <Tecla acender={acender} rotulo="Apagar" onPress={aoApagar} repetir larga={1.5} classe="tecla-fn"><Icone nome="apagar" tam={22} /></Tecla>}
+              <Faixa n={i + (pagina === "letras" ? 1 : 0)} efeito={t.efeito} />
             </div>
           ))}
           <div className="linha-tecla">

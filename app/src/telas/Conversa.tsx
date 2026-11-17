@@ -2,11 +2,16 @@ import { useState } from "react";
 import { api, ErroApi } from "../api";
 import { useVoxix } from "../estado";
 import { ChatBase } from "./ChatBase";
+import { PapelDaConversa } from "./PapelDaConversa";
+import { Avatar, useAvatarDe } from "../avatares";
+import { esquecerPapelDaConversa } from "../papelConversa";
 
 export function Conversa({ apelido }: { apelido: string }) {
   const { armazem, sessao, abrir, enviar, reenviar, apagar } = useVoxix();
   const conversa = armazem.conversas[apelido];
   const [denuncia, setDenuncia] = useState(false);
+  const [papel, setPapel] = useState(false);
+  const foto = useAvatarDe(apelido);
   if (!conversa) return null;
   const mensagens = conversa.mensagens;
 
@@ -20,18 +25,19 @@ export function Conversa({ apelido }: { apelido: string }) {
       chave={apelido}
       titulo={conversa.nome}
       subtitulo={`@${conversa.apelido}`}
-      avatar={<span className="avatar grid h-10 w-10 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{conversa.nome.slice(0, 1).toUpperCase()}</span>}
+      avatar={<Avatar valor={foto} nome={conversa.nome} tam={40} />}
       aoVoltar={() => abrir(null)}
       mensagens={mensagens}
       vazio={`Diga oi para ${conversa.nome}!`}
       menu={[
         { rotulo: "Bloquear", aoTocar: (av) => void bloquear(av) },
+        { rotulo: "Papel de parede", aoTocar: () => setPapel(true) },
         { rotulo: "Denunciar", aoTocar: () => setDenuncia(true) },
-        { rotulo: "Apagar conversa deste aparelho", perigo: true, aoTocar: () => apagar(apelido) },
+        { rotulo: "Apagar conversa deste aparelho", perigo: true, aoTocar: () => { esquecerPapelDaConversa(apelido); apagar(apelido); } },
       ]}
       aoEnviar={(t) => enviar(apelido, t)}
       aoReenviar={(id, corpo) => reenviar(apelido, id, corpo)}
-      extra={(avisar) => denuncia && sessao && <Denuncia apelido={apelido} trecho={mensagens.filter((m) => !m.minha).slice(-10).map((m) => m.corpo).join("\n")} token={sessao.token} fechar={() => setDenuncia(false)} aoEnviar={() => avisar("Denúncia enviada. Obrigado por avisar.")} />}
+      extra={(avisar) => <>{papel && <PapelDaConversa chave={apelido} nome={conversa.nome} fechar={() => setPapel(false)} />}{denuncia && sessao && <Denuncia apelido={apelido} trecho={mensagens.filter((m) => !m.minha).slice(-10).map((m) => m.corpo).join("\n")} token={sessao.token} fechar={() => setDenuncia(false)} aoEnviar={() => avisar("Denúncia enviada. Obrigado por avisar.")} />}</>}
     />
   );
 }

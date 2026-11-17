@@ -4,6 +4,7 @@ import { iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
 import { Icone } from "../icones";
 import { PapelDeParede } from "../papel";
+import { usePapelDaConversa } from "../papelConversa";
 import { Teclado } from "../Teclado";
 import { BarraSugestoes } from "../BarraSugestoes";
 import type { ReactNode } from "react";
@@ -75,6 +76,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   const marcar = (c: Correcao | null) => { ultimaCorrecao.current = c; setDesfazer(c); };
   const [aviso, setAviso] = useState("");
   const [menuAberto, setMenu] = useState(false);
+  const papelProprio = usePapelDaConversa(apelido);
   const [ouvindo, setOuvindo] = useState(false);
   const ditado = useRef<Ditado | null>(null);
   const caixa = useRef<HTMLTextAreaElement>(null);
@@ -287,7 +289,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
       </header>
       {cabecalhoExtra}
 
-      <div className="relative min-h-0 flex-1"><PapelDeParede qual="conversa" />
+      <div className="relative min-h-0 flex-1"><PapelDeParede qual="conversa" cfg={papelProprio?.cfg} fotoUrl={papelProprio ? papelProprio.foto : undefined} />
       <div className="rolagem absolute inset-0 z-[1] space-y-1.5 overflow-y-auto px-3 py-3">
         {mensagens.length === 0 && <p className="py-10 text-center text-sm text-suave">{vazio}</p>}
         <ListaMensagens mensagens={mensagens} aoReenviar={reenviarMsg} />

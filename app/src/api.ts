@@ -28,8 +28,8 @@ export async function chamar<T>(metodo: string, caminho: string, corpo?: unknown
   return d as T;
 }
 
-export interface Perfil { apelido: string | null; nome?: string; nomeSugerido?: string }
-export interface Pessoa { apelido: string; nome: string }
+export interface Perfil { apelido: string | null; nome?: string; nomeSugerido?: string; avatar?: string | null }
+export interface Pessoa { apelido: string; nome: string; avatar?: string | null }
 export interface ItemDoHistorico { id: string; minha: boolean; apelido: string; nome: string; corpo: string; tipo: string; criado: number }
 export interface MensagemDoServidor { id: string; de: string; deNome: string; conversa: string; corpo: string; tipo: string; criado: number }
 
@@ -61,6 +61,8 @@ export const api = {
   enviar: (t: string, para: string, corpo: string, idLocal: string) => chamar<{ ok: boolean; id: string; criado: number }>("POST", "/voxix/mensagens", { para, corpo, idLocal }, t),
   historico: (t: string, desde: number, limite = 300) => chamar<{ mensagens: ItemDoHistorico[]; mais: boolean }>("GET", `/voxix/historico?desde=${desde}&limite=${limite}`, undefined, t, 30000),
   limparConversa: (t: string, apelido: string) => chamar("DELETE", `/voxix/conversas/${encodeURIComponent(apelido)}`, undefined, t),
+  definirAvatar: (t: string, avatar: string | null) => chamar<{ avatar: string | null }>("PUT", "/voxix/perfil/avatar", { avatar }, t),
+  avatares: (t: string, apelidos: string[]) => chamar<{ avatares: Record<string, string | null> }>("GET", `/voxix/avatares?apelidos=${encodeURIComponent(apelidos.join(","))}`, undefined, t),
   bloqueios: (t: string) => chamar<{ bloqueios: Pessoa[] }>("GET", "/voxix/bloqueios", undefined, t),
   bloquear: (t: string, apelido: string) => chamar("POST", "/voxix/bloqueios", { apelido }, t),
   desbloquear: (t: string, apelido: string) => chamar("DELETE", `/voxix/bloqueios/${encodeURIComponent(apelido)}`, undefined, t),

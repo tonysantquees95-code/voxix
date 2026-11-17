@@ -4,6 +4,7 @@ import { BUILD, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { Icone } from "../icones";
 import { Logo } from "../logo";
+import { Avatar, useAvatarDe } from "../avatares";
 import { PapelDeParede } from "../papel";
 import { Ajustes } from "./Ajustes";
 import { Conversa } from "./Conversa";
@@ -37,14 +38,20 @@ export function Principal() {
     <div className="grid h-full grid-cols-[minmax(0,1fr)] md:grid-cols-[340px_minmax(0,1fr)]">
       <aside className={`${algoAberto ? "hidden md:flex" : "flex"} relative min-h-0 flex-col overflow-hidden border-r border-borda bg-painel`}>
         <PapelDeParede qual="inicio" />
-        <header className="relative z-[1] flex items-center gap-3 px-4 py-3">
-          <Logo tam={32} />
-          <div className="min-w-0 flex-1">
-            <div className="font-extrabold leading-tight">Voxix{naoLidas > 0 && <span className="ml-2 rounded-full bg-magenta px-2 py-0.5 text-xs text-[#1a0620]">{naoLidas}</span>}</div>
-            <div className="truncate text-xs text-suave">@{perfil?.apelido} · <span className={conexao === "conectado" ? "text-ok" : conexao === "conectando" ? "text-aviso" : "text-erro"}>{conexao === "conectado" ? "ao vivo" : conexao === "conectando" ? "conectando…" : "sem conexão"}</span></div>
+        <header className="relative z-[1] px-4 pb-1 pt-3">
+          <div className="flex items-center gap-3">
+            <Logo tam={32} />
+            <div className="min-w-0 flex-1 text-lg font-extrabold leading-tight">Voxix{naoLidas > 0 && <span className="ml-2 rounded-full bg-magenta px-2 py-0.5 text-xs text-[#1a0620]">{naoLidas}</span>}</div>
+            <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="botao-redondo grid h-9 w-9 place-items-center bg-neon text-xl font-bold text-white"><Icone nome="adicionar" tam={22} /></button>
           </div>
-          <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="botao-redondo grid h-9 w-9 place-items-center bg-neon text-xl font-bold text-white"><Icone nome="adicionar" tam={22} /></button>
-          <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="botao-redondo grid h-9 w-9 place-items-center border border-borda text-lg"><Icone nome="config" tam={20} /></button>
+          <button onClick={() => setPainel("ajustes")} aria-label="Abrir meus ajustes" className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-borda bg-black/20 px-3 py-2 text-left">
+            <Avatar valor={perfil?.avatar} nome={perfil?.nome ?? "?"} tam={48} />
+            <span className="min-w-0 flex-1">
+              <b className="block truncate leading-tight">{perfil?.nome}</b>
+              <span className="block truncate text-xs text-suave">@{perfil?.apelido} · <span className={conexao === "conectado" ? "text-ok" : conexao === "conectando" ? "text-aviso" : "text-erro"}>{conexao === "conectado" ? "ao vivo" : conexao === "conectando" ? "conectando…" : "sem conexão"}</span></span>
+            </span>
+            <Icone nome="config" tam={20} />
+          </button>
         </header>
         <div className="relative z-[1]"><Aviso /><AvisoDeNotificacao /></div>
         <div className="relative z-[1] mx-4 mb-2 grid grid-cols-2 gap-2" role="tablist">
@@ -59,7 +66,7 @@ export function Principal() {
             const ult = c.mensagens[c.mensagens.length - 1];
             return (
               <button key={c.apelido} onClick={() => abrirConversa(c.apelido)} className={`flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-white/5 ${aberta === c.apelido ? "bg-white/10" : ""}`}>
-                <span className="avatar grid h-11 w-11 flex-none place-items-center bg-gradient-to-br from-neon to-magenta font-extrabold text-white">{c.nome.slice(0, 1).toUpperCase()}</span>
+                <span className="flex-none"><AvatarDe apelido={c.apelido} nome={c.nome} tam={44} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="flex justify-between gap-2"><b className="truncate">{c.nome}</b><span className="flex-none text-xs text-suave">{ult ? hora(ult.criado) : ""}</span></span>
                   <span className="flex justify-between gap-2"><span className="truncate text-sm text-suave">{ult ? `${ult.minha ? "Você: " : ""}${ult.corpo}` : "Diga oi!"}</span>{c.naoLidas > 0 && <span className="flex-none rounded-full bg-magenta px-2 text-xs font-bold text-[#1a0620]">{c.naoLidas}</span>}</span>
@@ -77,6 +84,10 @@ export function Principal() {
       {painel === "ajustes" && <Ajustes fechar={() => setPainel(null)} />}
     </div>
   );
+}
+
+function AvatarDe({ apelido, nome, tam }: { apelido: string; nome: string; tam: number }) {
+  return <Avatar valor={useAvatarDe(apelido)} nome={nome} tam={tam} />;
 }
 
 /** Aviso de versão nova (confere uma vez ao abrir). */

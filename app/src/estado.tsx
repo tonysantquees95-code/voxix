@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { api, enderecoWs, ErroApi, type MensagemDoServidor, type Pessoa } from "./api";
 import * as A from "./armazem";
 import { avisar, naTela } from "./avisos";
+import { atualizarAvatares, definirAvatarLocal } from "./avatares";
 import { entrar as entrarNaConta, guardarSessao, sair as sairDaConta, sessaoGuardada, sessaoMorta, type Sessao } from "./conta";
 
 const CHAVE_CONVERSAS = "voxix.conversas";
@@ -24,6 +25,7 @@ interface Valor {
   entrar: (email: string, senha: string) => Promise<void>;
   sair: () => Promise<void>;
   criarPerfil: (apelido: string, nome: string) => Promise<void>;
+  mudarAvatar: (avatar: string | null) => Promise<void>;
   abrir: (apelido: string | null) => void;
   novaConversa: (apelido: string) => Promise<Pessoa>;
   enviar: (apelido: string, texto: string) => Promise<void>;
@@ -61,7 +63,7 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
     if (!sessao) return;
     let vivo = true;
     api.perfil(sessao.token)
-      .then((p) => { if (vivo) setPerfil(p.apelido ? { apelido: p.apelido, nome: p.nome ?? p.apelido } : null); })
+      .then((p) => { if (vivo) setPerfil(p.apelido ? { apelido: p.apelido, nome: p.nome ?? p.apelido, avatar: p.avatar ?? null } : null); if (vivo && p.apelido) definirAvatarLocal(p.apelido, p.avatar ?? null); })
       .catch((e) => { if (sessaoMorta(e)) sairLocal(); else if (vivo) setPerfil((x) => x ?? undefined); });
     return () => { vivo = false; };
   }, [sessao, sairLocal]);
@@ -147,6 +149,12 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
     if (!sessao) return;
     setPerfil(await api.criarPerfil(sessao.token, apelido, nome));
   }, [sessao]);
+  const mudarAvatar = useCallback(async (avatar: string | null) => {
+    if (!sessao || !perfil) return;
+    const r = await api.definirAvatar(sessao.token, avatar);
+    definirAvatarLocal(perfil.apelido, r.avatar);
+    setPerfil((p) => (p ? { ...p, avatar: r.avatar } : p));
+  }, [sessao, perfil]);
   const abrir = useCallback((apelido: string | null) => {
     const k = apelido ? apelido.toLowerCase() : null;
     abertaRef.current = k;
@@ -183,11 +191,17 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
   }, [atualizar, mandar]);
   const apagar = useCallback((apelido: string) => { if (sessao) void api.limparConversa(sessao.token, apelido).catch(() => undefined); atualizar((a) => A.apagarConversa(a, apelido)); if (abertaRef.current === apelido.toLowerCase()) abrir(null); }, [sessao, atualizar, abrir]);
 
+  // pega as fotinhas de quem está nas conversas (guarda um tempo no aparelho)
+  const chaveConversas = Object.keys(armazem.conversas).sort().join(",");
+  useEffect(() => {
+    if (sessao && chaveConversas) void atualizarAvatares(sessao.token, chaveConversas.split(","));
+  }, [sessao, chaveConversas]);
+
   useEffect(() => {
     const n = A.totalNaoLidas(armazem);
     document.title = n > 0 ? `(${n}) Voxix` : "Voxix";
   }, [armazem]);
 
-  const valor = useMemo<Valor>(() => ({ sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, abrir, novaConversa, enviar, reenviar, apagar }), [sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, abrir, novaConversa, enviar, reenviar, apagar]);
+  const valor = useMemo<Valor>(() => ({ sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, mudarAvatar, abrir, novaConversa, enviar, reenviar, apagar }), [sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, mudarAvatar, abrir, novaConversa, enviar, reenviar, apagar]);
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }

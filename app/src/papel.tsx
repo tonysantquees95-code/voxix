@@ -56,9 +56,10 @@ export function reduzirImagem(arquivo: File, maximo = 1280): Promise<string> {
 }
 
 /** Camada do papel de parede, para ficar atrás do conteúdo (o pai precisa ser `relative`). */
-export function PapelDeParede({ qual, cfg }: { qual: Qual; cfg?: PapelCfg }) {
+export function PapelDeParede({ qual, cfg, fotoUrl }: { qual: Qual; cfg?: PapelCfg; fotoUrl?: string | null }) {
   const v = useVisual();
-  const foto = useFoto(qual);
+  const fotoGeral = useFoto(qual);
+  const foto = fotoUrl !== undefined ? fotoUrl : fotoGeral;
   const p = cfg ?? (qual === "inicio" ? v.papelInicio : v.papelConversa);
   if (p.modelo === "nenhum") return null;
   const comFoto = p.modelo === "foto";

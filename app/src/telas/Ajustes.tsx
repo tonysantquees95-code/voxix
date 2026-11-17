@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type Pessoa } from "../api";
 import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
+import { plataforma } from "../conta";
 import { abrirLink } from "../link";
 import { Logo } from "../logo";
 import { Icone } from "../icones";
@@ -59,6 +60,13 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
             <div key={p.apelido} className="mt-1 flex items-center justify-between text-sm"><span>@{p.apelido}</span><button onClick={() => void desbloquear(p.apelido)} className="text-neon underline">Desbloquear</button></div>
           ))}
         </section>
+        {plataforma() === "web" ? (
+          <section>
+            <h3 className="text-sm font-bold text-suave">Instalar no celular</h3>
+            <p className="mt-1 text-sm">Esta versão no navegador sempre está atualizada. Para ter o ícone do Voxix na tela de início:</p>
+            <p className="mt-1 text-xs text-suave">iPhone (Safari): toque em Compartilhar e em “Adicionar à Tela de Início”.<br />Android (Chrome): menu ⋮ e “Instalar app”.</p>
+          </section>
+        ) : (
         <section>
           <h3 className="text-sm font-bold text-suave">Atualização</h3>
           <p className="mt-1 text-sm">Versão instalada: {BUILD > 0 ? `1.${BUILD}` : "desenvolvimento"}</p>
@@ -68,6 +76,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
           </div>
           {versao && <p className="mt-1 text-xs text-suave" role="status">{versao}</p>}
         </section>
+        )}
         <section>
           <h3 className="text-sm font-bold text-suave">Sobre o Voxix</h3>
           <div className="mt-2 flex flex-col gap-2 text-sm">

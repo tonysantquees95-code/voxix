@@ -24,9 +24,9 @@ button { cursor: pointer; }
 @keyframes luz-matiz { 0%, 100% { stroke: #ff2a2a; } 33% { stroke: #2aff5a; } 66% { stroke: #2a6bff; } }
 /* O logo animado fica na própria camada, para não repintar (e embaçar) o resto da tela. */
 .logo-isolado { transform: translateZ(0); contain: paint; }
+/* As luzes sempre correm, também no Windows e no navegador (o "reduzir movimento" do sistema não desliga o visual do Voxix). */
 .luz-faixa { animation: luz-corre 4.2s linear infinite; }
 .luz-faixa.luz-rgb { animation: luz-corre 4.2s linear infinite, luz-matiz 5s linear infinite; }
-@media (prefers-reduced-motion: reduce) { .luz-faixa, .luz-faixa.luz-rgb { animation: none; } }
 
 /* Ícone sobre fundo na cor do app fica sempre branco (senão, com "ícones na cor do app", sumia no botão). */
 .bg-neon svg, .tecla-enviar svg, .balao-meu svg, .avatar svg { color: #fff !important; }
@@ -79,14 +79,12 @@ button { cursor: pointer; }
 .borda-luz.d i { animation: faixa-desce 3s linear infinite; } .borda-luz.e i { animation: faixa-sobe 3s linear infinite; }
 @keyframes faixa-desce { from { transform: translateY(-100%); } to { transform: translateY(360%); } }
 @keyframes faixa-sobe { from { transform: translateY(360%); } to { transform: translateY(-100%); } }
-@media (prefers-reduced-motion: reduce) { .borda-luz i { animation: none; } }
 /* luzes que correm no vão embaixo de cada fileira, cada uma para um lado */
 .faixa-luz { position: absolute; left: 0; right: 0; top: calc(100% + 2px); height: 2px; overflow: hidden; pointer-events: none; border-radius: 2px; background: color-mix(in srgb, var(--color-neon) 10%, transparent); }
 .faixa-luz i { position: absolute; left: 0; top: 0; bottom: 0; width: 28%; animation: faixa-ida 2.8s linear infinite; will-change: transform; }
 .faixa-luz i.volta { animation-name: faixa-volta; }
 @keyframes faixa-ida { from { transform: translateX(-100%); } to { transform: translateX(360%); } }
 @keyframes faixa-volta { from { transform: translateX(360%); } to { transform: translateX(-100%); } }
-@media (prefers-reduced-motion: reduce) { .faixa-luz i { animation: none; } }
 .popup-acento { position: absolute; left: 6px; right: 6px; top: -52px; display: flex; gap: 4px; padding: 6px; background: var(--color-painel); border: 1px solid var(--color-neon); border-radius: var(--r-balao); z-index: 5; }
 .popup-acento button { flex: 1; height: 38px; font-size: 1.15rem; border-radius: var(--r-tecla); background: color-mix(in srgb, var(--color-neon) 20%, transparent); color: var(--color-texto); }
 .pacote { flex: none; width: 38px; height: 34px; font-size: 1.2rem; border-radius: var(--r-tecla); border: 1px solid transparent; }

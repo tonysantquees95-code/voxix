@@ -1,0 +1,13 @@
+{
+  "name": "Voxix (app + Android)",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": { "version": "21", "installGradle": false },
+    "ghcr.io/devcontainers/features/node:1": { "version": "22" }
+  },
+  "postCreateCommand": "cd app && npm install --no-audit --no-fund",
+  "forwardPorts": [5173],
+  "customizations": {
+    "vscode": { "extensions": ["dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss"] }
+  }
+}

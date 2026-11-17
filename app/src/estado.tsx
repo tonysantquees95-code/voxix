@@ -2,6 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { api, enderecoWs, ErroApi, type MensagemDoServidor, type Pessoa } from "./api";
 import * as A from "./armazem";
+import { avisar, naTela } from "./avisos";
 import { entrar as entrarNaConta, guardarSessao, sair as sairDaConta, sessaoGuardada, sessaoMorta, type Sessao } from "./conta";
 
 const CHAVE_CONVERSAS = "voxix.conversas";
@@ -76,14 +77,42 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
 
     const receberLote = (lista: MensagemDoServidor[]) => {
       if (!lista.length) return;
-      for (const m of lista) atualizar((a) => A.receber(a, m.de, m.deNome, m.id, m.corpo, m.criado, abertaRef.current === m.de.toLowerCase()));
+      for (const m of lista) {
+        const novo = !A.temMensagem(arm.current, m.id);
+        atualizar((a) => A.receber(a, m.de, m.deNome, m.id, m.corpo, m.criado, abertaRef.current === m.de.toLowerCase()));
+        if (novo) avisarChegada(m.de, m.deNome, m.corpo, m.criado);
+      }
       if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: "ack", ids: lista.map((m) => m.id) }));
+    };
+    // aviso do sistema para mensagem nova (só quando a conversa não está na tela e a mensagem é recente: não avisa o histórico antigo)
+    const avisarChegada = (apelido: string, nome: string, corpo: string, criado: number) => {
+      if (Date.now() - criado > 120_000) return;
+      if (naTela(abertaRef.current === apelido.toLowerCase())) return;
+      void avisar(nome || apelido, corpo, `dm-${apelido.toLowerCase()}`);
+    };
+    // histórico no servidor: traz o que foi escrito em outros aparelhos (e tudo, ao entrar num aparelho novo)
+    const sincronizarHistorico = async () => {
+      const chaveMarca = `voxix.hist.${sessao.email}`;
+      let marca = 0;
+      try { marca = Number(localStorage.getItem(chaveMarca)) || 0; } catch { /* sem armazenamento: busca tudo */ }
+      if (Object.keys(arm.current.conversas).length === 0) marca = 0; // armazenamento do aparelho vazio: busca tudo de novo
+      const primeira = marca === 0;
+      for (let volta = 0; volta < 40 && !parar; volta++) {
+        const r = await api.historico(sessao.token, marca);
+        if (parar || r.mensagens.length === 0) break;
+        const novas = r.mensagens.filter((m) => !A.temMensagem(arm.current, m.id));
+        atualizar((a) => { const b = A.mesclarHistorico(a, r.mensagens, !primeira); return abertaRef.current ? A.marcarLida(b, abertaRef.current) : b; });
+        if (!primeira) for (const m of novas) if (!m.minha) avisarChegada(m.apelido, m.nome, m.corpo, m.criado);
+        marca = r.mensagens[r.mensagens.length - 1]!.criado;
+        try { localStorage.setItem(chaveMarca, String(marca)); } catch { /* ok */ }
+        if (!r.mais) break;
+      }
     };
     const conectar = () => {
       if (parar) return;
       setConexao("conectando");
       ws = new WebSocket(enderecoWs(sessao.token));
-      ws.onopen = () => { tentativa = 0; setConexao("conectado"); clearInterval(batida); batida = setInterval(() => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: "ping" })); }, 25000); };
+      ws.onopen = () => { tentativa = 0; setConexao("conectado"); void sincronizarHistorico().catch((er) => { if (sessaoMorta(er)) sairLocal(); }); clearInterval(batida); batida = setInterval(() => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: "ping" })); }, 25000); };
       ws.onmessage = (e) => {
         try {
           const d = JSON.parse(String(e.data)) as { t: string; mensagens?: MensagemDoServidor[]; mensagem?: MensagemDoServidor };
@@ -152,7 +181,12 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
     atualizar((a) => A.tentando(a, apelido, id));
     await mandar(apelido, id, texto);
   }, [atualizar, mandar]);
-  const apagar = useCallback((apelido: string) => { atualizar((a) => A.apagarConversa(a, apelido)); if (abertaRef.current === apelido.toLowerCase()) abrir(null); }, [atualizar, abrir]);
+  const apagar = useCallback((apelido: string) => { if (sessao) void api.limparConversa(sessao.token, apelido).catch(() => undefined); atualizar((a) => A.apagarConversa(a, apelido)); if (abertaRef.current === apelido.toLowerCase()) abrir(null); }, [sessao, atualizar, abrir]);
+
+  useEffect(() => {
+    const n = A.totalNaoLidas(armazem);
+    document.title = n > 0 ? `(${n}) Voxix` : "Voxix";
+  }, [armazem]);
 
   const valor = useMemo<Valor>(() => ({ sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, abrir, novaConversa, enviar, reenviar, apagar }), [sessao, perfil, armazem, conexao, aberta, entrar, sair, criarPerfil, abrir, novaConversa, enviar, reenviar, apagar]);
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;

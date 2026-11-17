@@ -3,6 +3,7 @@ import { api, type Pessoa } from "../api";
 import { BUILD, enderecoDoDownload, haNovaVersao, procurarVersao } from "../atualizacao";
 import { useVoxix } from "../estado";
 import { plataforma } from "../conta";
+import { avisosLigados, ligarAvisos, permissaoDeAvisos, pedirAvisos, type PermissaoAvisos } from "../avisos";
 import { abrirLink } from "../link";
 import { Logo } from "../logo";
 import { Icone } from "../icones";
@@ -18,6 +19,14 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   const [novaVersao, setNovaVersao] = useState(false);
   const [ver, setVer] = useState<"tour" | "termos" | "novidades" | null>(null);
   const [personalizando, setPersonalizando] = useState(false);
+  const [avisos, setAvisos] = useState(avisosLigados());
+  const [permissao, setPermissao] = useState<PermissaoAvisos>("default");
+  useEffect(() => { void permissaoDeAvisos().then(setPermissao); }, []);
+  const mudarAvisos = async (v: boolean) => {
+    setAvisos(v);
+    ligarAvisos(v);
+    if (v && permissao !== "granted") setPermissao((await pedirAvisos()) ? "granted" : await permissaoDeAvisos());
+  };
 
   useEffect(() => { if (sessao) void api.bloqueios(sessao.token).then((r) => setBloqueados(r.bloqueios)).catch(() => setBloqueados([])); }, [sessao]);
 
@@ -55,6 +64,16 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
           </button>
         </section>
         <section>
+          <h3 className="text-sm font-bold text-suave">Avisos</h3>
+          <label className="mt-2 flex items-center justify-between gap-3 rounded-xl border border-borda px-4 py-3 text-sm">
+            <span className="min-w-0"><b className="block">Avisar quando chegar mensagem</b><span className="block text-xs text-suave">Uma notificação no celular, no computador ou no navegador, quando a conversa não está na tela.</span></span>
+            <input type="checkbox" checked={avisos} onChange={(e) => void mudarAvisos(e.target.checked)} className="h-5 w-5 flex-none accent-[var(--color-neon)]" />
+          </label>
+          {avisos && permissao === "denied" && <p className="mt-1 text-xs text-erro">Os avisos estão bloqueados neste aparelho. Libere a notificação do Voxix nas configurações do navegador ou do sistema.</p>}
+          {avisos && permissao === "indisponivel" && <p className="mt-1 text-xs text-suave">Este navegador não mostra avisos. No iPhone, instale o Voxix na tela de início (Compartilhar › Adicionar à Tela de Início) e abra por lá.</p>}
+          {avisos && permissao === "default" && <button onClick={() => void mudarAvisos(true)} className="mt-2 rounded-xl border border-borda px-4 py-2 text-sm">Permitir avisos neste aparelho</button>}
+        </section>
+        <section>
           <h3 className="text-sm font-bold text-suave">Bloqueados</h3>
           {bloqueados === null ? <p className="mt-1 text-sm text-suave">Carregando…</p> : bloqueados.length === 0 ? <p className="mt-1 text-sm text-suave">Ninguém bloqueado.</p> : bloqueados.map((p) => (
             <div key={p.apelido} className="mt-1 flex items-center justify-between text-sm"><span>@{p.apelido}</span><button onClick={() => void desbloquear(p.apelido)} className="text-neon underline">Desbloquear</button></div>
@@ -85,7 +104,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
             <button onClick={() => setVer("termos")} className="rounded-xl border border-borda px-4 py-2 text-left">Termos de uso</button>
           </div>
         </section>
-        <p className="text-xs text-suave">As conversas ficam só neste aparelho. Se você sair da conta, o histórico continua guardado aqui.</p>
+        <p className="text-xs text-suave">As conversas ficam guardadas na sua conta e aparecem em todos os aparelhos em que você entrar. Apagar uma conversa a remove só para você.</p>
         <button onClick={() => void sair()} className="w-full rounded-xl border border-erro py-2.5 font-bold text-erro">Sair da conta</button>
       </div>
       {personalizando && <Personalizar fechar={() => setPersonalizando(false)} irParaInicio={fechar} />}

@@ -10,6 +10,7 @@ import { Conversa } from "./Conversa";
 import { NovaConversa } from "./NovaConversa";
 import { Comunidade } from "./Comunidade";
 import { ListaComunidades } from "./Comunidades";
+import { avisosLigados, pedirAvisos, permissaoDeAvisos } from "../avisos";
 
 const hora = (t: number): string => {
   const d = new Date(t);
@@ -45,7 +46,7 @@ export function Principal() {
           <button onClick={() => setPainel("nova")} aria-label="Nova conversa" className="botao-redondo grid h-9 w-9 place-items-center bg-neon text-xl font-bold text-white"><Icone nome="adicionar" tam={22} /></button>
           <button onClick={() => setPainel("ajustes")} aria-label="Ajustes" className="botao-redondo grid h-9 w-9 place-items-center border border-borda text-lg"><Icone nome="config" tam={20} /></button>
         </header>
-        <div className="relative z-[1]"><Aviso /></div>
+        <div className="relative z-[1]"><Aviso /><AvisoDeNotificacao /></div>
         <div className="relative z-[1] mx-4 mb-2 grid grid-cols-2 gap-2" role="tablist">
           {([["conversas", "Conversas", "enviar"], ["comunidades", "Comunidades", "grupo"]] as const).map(([id, rot, ico]) => (
             <button key={id} role="tab" aria-selected={aba === id} onClick={() => setAba(id)} className={`flex items-center justify-center gap-1.5 rounded-xl border py-1.5 text-sm font-bold ${aba === id ? "border-neon bg-neon/15 text-neon" : "border-borda text-suave"}`}><Icone nome={ico} tam={16} />{rot}</button>
@@ -88,4 +89,17 @@ function Aviso() {
   }, []);
   if (!nova) return null;
   return <div className="mx-4 mb-2 rounded-xl border border-neon/40 bg-neon/10 px-3 py-2 text-xs">Há uma versão nova do Voxix (1.{nova}). Abra os <b>Ajustes</b> para atualizar.</div>;
+}
+
+/** Convite para liberar os avisos de mensagem (a permissão só pode ser pedida num toque). Some quando liberada ou recusada. */
+function AvisoDeNotificacao() {
+  const [pedir, setPedir] = useState(false);
+  useEffect(() => { void permissaoDeAvisos().then((p) => setPedir(p === "default" && avisosLigados())); }, []);
+  if (!pedir) return null;
+  return (
+    <div className="mx-4 mb-2 flex items-center justify-between gap-3 rounded-xl border border-neon/40 bg-neon/10 px-3 py-2 text-xs">
+      <span>Quer ser avisado quando chegar mensagem?</span>
+      <button onClick={() => { void pedirAvisos().then(() => permissaoDeAvisos().then((p) => setPedir(p === "default"))); }} className="flex-none rounded-lg bg-neon px-3 py-1 font-bold text-white">Ativar avisos</button>
+    </div>
+  );
 }

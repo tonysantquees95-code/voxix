@@ -44,3 +44,17 @@ test("leitura ignora lixo e o que estava 'enviando' vira 'falhou' (o app fechou 
   assert.equal(a.conversas.beto.mensagens[0].estado, "falhou");
   assert.equal(a.conversas.beto.naoLidas, 2);
 });
+
+test("histórico do servidor entra sem repetir e confirmar não duplica", async () => {
+  const A = await import("../src/armazem.ts");
+  let a = A.vazio();
+  a = A.enviando(a, "beto", "Beto", "local1", "oi", 100);
+  // o histórico traz a mesma mensagem com o id do servidor, antes da confirmação
+  a = A.mesclarHistorico(a, [{ id: "srv1", minha: true, apelido: "beto", nome: "Beto", corpo: "oi", criado: 100 }, { id: "srv2", minha: false, apelido: "beto", nome: "Beto", corpo: "e aí", criado: 200 }], true);
+  a = A.confirmar(a, "beto", "local1", "srv1", 100);
+  assert.deepEqual(a.conversas.beto.mensagens.map((m) => m.id), ["srv1", "srv2"]);
+  assert.equal(a.conversas.beto.naoLidas, 1); // só a que veio do outro conta como não lida
+  assert.equal(A.temMensagem(a, "srv2"), true);
+  const b = A.mesclarHistorico(A.vazio(), [{ id: "x", minha: false, apelido: "ana", nome: "Ana", corpo: "oi", criado: 1 }], false);
+  assert.equal(b.conversas.ana.naoLidas, 0); // primeira carga num aparelho novo: nada de "não lido" antigo
+});

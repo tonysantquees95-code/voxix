@@ -93,7 +93,7 @@ jobs:
           sed -i "s/versionName \"[^\"]*\"/versionName \"1.${{ github.run_number }}\"/; s/versionCode [0-9]*/versionCode ${{ github.run_number }}/" android/app/build.gradle
           grep -n "versionName\|versionCode" android/app/build.gradle
           # ditado por voz do aparelho: microfone + visibilidade do serviço de reconhecimento de fala (Android 11+)
-          sed -i "s#<application#<uses-permission android:name=\"android.permission.RECORD_AUDIO\" />\n    <queries>\n        <intent>\n            <action android:name=\"android.speech.RecognitionService\" />\n        </intent>\n    </queries>\n    <application#" android/app/src/main/AndroidManifest.xml
+          sed -i "s#<application#<uses-permission android:name=\"android.permission.RECORD_AUDIO\" />\n    <uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\" />\n    <queries>\n        <intent>\n            <action android:name=\"android.speech.RecognitionService\" />\n        </intent>\n    </queries>\n    <application#" android/app/src/main/AndroidManifest.xml
           grep -c "RECORD_AUDIO" android/app/src/main/AndroidManifest.xml
           # a tela fica entre as barras do Android (status e navegação), em qualquer configuração do aparelho
           cp native/MainActivity.java android/app/src/main/java/tech/vetorial/voxix/MainActivity.java

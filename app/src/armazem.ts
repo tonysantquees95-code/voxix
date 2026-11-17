@@ -1,4 +1,4 @@
-// Histórico das conversas: fica só no aparelho (o servidor apaga a mensagem depois de entregue).
+// Histórico das conversas: o servidor guarda tudo (igual em todos os aparelhos da conta); aqui fica a cópia deste aparelho, para abrir rápido e offline.
 // Tudo aqui é função pura sobre um objeto simples, para dar para testar sem tela.
 export type EstadoMsg = "enviando" | "enviada" | "falhou";
 export interface Msg { id: string; minha: boolean; corpo: string; criado: number; estado: EstadoMsg }
@@ -42,10 +42,27 @@ function trocar(a: Armazem, apelido: string, id: string, f: (m: Msg) => Msg): Ar
   if (!c) return a;
   return { conversas: { ...a.conversas, [k]: { ...c, mensagens: c.mensagens.map((m) => (m.id === id ? f(m) : m)) } } };
 }
-export const confirmar = (a: Armazem, apelido: string, idLocal: string, idServidor: string, criado: number): Armazem =>
-  trocar(a, apelido, idLocal, (m) => ({ ...m, id: idServidor, criado, estado: "enviada" }));
+export function confirmar(a: Armazem, apelido: string, idLocal: string, idServidor: string, criado: number): Armazem {
+  const r = trocar(a, apelido, idLocal, (m) => ({ ...m, id: idServidor, criado, estado: "enviada" }));
+  const c = r.conversas[chave(apelido)];
+  if (!c) return r;
+  // o histórico do servidor pode ter chegado antes da confirmação: fica uma mensagem só
+  const vistos = new Set<string>();
+  const mensagens = c.mensagens.filter((m) => (vistos.has(m.id) ? false : (vistos.add(m.id), true)));
+  return mensagens.length === c.mensagens.length ? r : { conversas: { ...r.conversas, [chave(apelido)]: { ...c, mensagens } } };
+}
 export const falhou = (a: Armazem, apelido: string, idLocal: string): Armazem => trocar(a, apelido, idLocal, (m) => ({ ...m, estado: "falhou" }));
 export const tentando = (a: Armazem, apelido: string, id: string): Armazem => trocar(a, apelido, id, (m) => ({ ...m, estado: "enviando" }));
+
+export const temMensagem = (a: Armazem, id: string): boolean => Object.values(a.conversas).some((c) => c.mensagens.some((m) => m.id === id));
+
+export interface ItemHist { id: string; minha: boolean; apelido: string; nome: string; corpo: string; criado: number }
+/** Junta o histórico que veio do servidor com o que já está aqui (sem repetir). `contarNaoLidas`: o que veio de outras pessoas conta como não lido. */
+export function mesclarHistorico(a: Armazem, itens: ItemHist[], contarNaoLidas: boolean): Armazem {
+  let r = a;
+  for (const i of itens) r = comMsg(r, i.apelido, i.nome, { id: i.id, minha: i.minha, corpo: i.corpo, criado: i.criado, estado: "enviada" }, contarNaoLidas && !i.minha);
+  return r;
+}
 
 export function marcarLida(a: Armazem, apelido: string): Armazem {
   const k = chave(apelido);

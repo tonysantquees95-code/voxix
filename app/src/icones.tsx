@@ -2,7 +2,7 @@ import { ESCALAS_ICONE, TRACOS } from "./personalizar";
 import { useVisual } from "./useVisual";
 
 export type NomeIcone =
-  | "config" | "fechar" | "voltar" | "mais" | "adicionar" | "enviar" | "microfone" | "inicio" | "teclado" | "cores" | "formato" | "fundo"
+  | "config" | "fechar" | "voltar" | "mais" | "adicionar" | "enviar" | "microfone" | "parar" | "inicio" | "teclado" | "cores" | "formato" | "fundo"
   | "emoji" | "apagar" | "enter" | "shift" | "shiftTrava" | "estrela" | "seta"
   | "grupo" | "jogo" | "raio" | "coracao" | "escudo" | "chama" | "planeta" | "link" | "copiar" | "cadeado" | "hash" | "globo" | "buscar" | "sair";
 
@@ -30,6 +30,7 @@ const DESENHOS: Record<NomeIcone, { area?: string; linhas?: string; pontos?: [nu
   mais: { pontos: [[12, 5], [12, 12], [12, 19]] },
   adicionar: { linhas: "M12 5v14M5 12h14" },
   enviar: { area: "M4 12L20 4l-5 16-3.5-6.5z", linhas: "M11.5 13.5L20 4" },
+  parar: { area: "M8 8h8v8H8z", linhas: "" },
   microfone: { area: "M12 3a3 3 0 00-3 3v5a3 3 0 006 0V6a3 3 0 00-3-3z", linhas: "M5 11a7 7 0 0014 0M12 18v3M9 21h6" },
   inicio: { area: "M4 11l8-7 8 7v9h-5v-6H9v6H4z" },
   teclado: { area: "M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z", linhas: "M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10" },

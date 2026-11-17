@@ -1,6 +1,6 @@
 import { useDeferredValue, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { ErroApi } from "../api";
-import { iniciarDitado, type Ditado } from "../ditado";
+import { aquecerDitado, iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
 import { Icone } from "../icones";
 import { PapelDeParede } from "../papel";
@@ -98,6 +98,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
 
   useEffect(() => { fim.current?.scrollIntoView({ block: "end" }); }, [mensagens.length, apelido]);
   useEffect(() => () => { void ditado.current?.parar(); }, [apelido]);
+  useEffect(() => { aquecerDitado(); }, []);
   useEffect(() => { textoRef.current = ""; marcar(null); setTexto(""); setCursor(0); setAviso(""); setMenu(false); }, [apelido]);
 
   // Depois que o texto novo entra no campo, o cursor vai para o lugar certo na mesma hora (sem esperar o próximo quadro:
@@ -299,7 +300,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
       {aviso && <p className="px-4 pb-1 text-xs text-aviso" role="status">{aviso}</p>}
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="relative flex items-end gap-2 border-t border-borda bg-painel p-2.5">
         {corretorLigado && !proprio && tecladoFisico && <BarraSugestoes flutuante literal={literal} opcoes={opcoes} aoEscolher={escolherSugestao} />}
-        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Parar o ditado" : "Ditar mensagem"} title="Ditado: fale e a fala vira texto" className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome="microfone" tam={22} /></button>
+        <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Pausar o ditado" : "Ditar mensagem"} title={ouvindo ? "Toque para pausar. O texto fica no campo para você enviar." : "Ditado: fale e a fala vira texto"} className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome={ouvindo ? "parar" : "microfone"} tam={22} /></button>
         {TELA_DE_TOQUE && (
           <button type="button" onClick={trocarTeclado} aria-label={visual.teclado.usar ? "Usar o teclado do celular" : "Usar o teclado do Voxix"} title={visual.teclado.usar ? "Usar o teclado do celular" : "Usar o teclado do Voxix"} className="botao-redondo grid h-11 w-11 flex-none place-items-center border border-borda text-neon"><Icone nome="teclado" tam={22} /></button>
         )}

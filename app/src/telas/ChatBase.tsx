@@ -1,5 +1,6 @@
 import { useDeferredValue, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { ErroApi } from "../api";
+import { ErroApi, api } from "../api";
+import { pontuacaoLocal } from "../pontuacao";
 import { aquecerDitado, iniciarDitado, type Ditado } from "../ditado";
 import { useVoxix } from "../estado";
 import { Icone } from "../icones";
@@ -78,6 +79,8 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
   const [menuAberto, setMenu] = useState(false);
   const papelProprio = usePapelDaConversa(apelido);
   const [ouvindo, setOuvindo] = useState(false);
+  const [preparando, setPreparando] = useState(false);
+  const enviandoRef = useRef(false);
   const ditado = useRef<Ditado | null>(null);
   const caixa = useRef<HTMLTextAreaElement>(null);
   const visual = useVisual();
@@ -234,7 +237,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     let t = textoRef.current.trim();
     if (!t) return;
     if (dicRef.current) t = corrigirFim(dicRef.current, palavrasDaPessoa(), t).trim(); // conserta também a última palavra
-    if (ouvindo) await ditado.current?.parar();
+    if (ouvindo) { enviandoRef.current = true; await ditado.current?.parar(); enviandoRef.current = false; }
     textoRef.current = "";
     marcar(null);
     setTexto("");
@@ -257,15 +260,33 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
     if (!sessao) return;
     setAviso("");
     const base = textoRef.current.trim();
+    let falado = "";
+    const montar = (parte: string) => (base ? `${base} ${parte}` : parte);
     try {
       setOuvindo(true);
+      setPreparando(true);
       ditado.current = await iniciarDitado({
-        aoTexto: (t) => { const x = base ? `${base} ${t}` : t; aplicar({ texto: x, pos: x.length }); },
-        aoFim: () => { setOuvindo(false); ditado.current = null; },
+        aoPronto: () => setPreparando(false),
+        aoTexto: (t) => { falado = t; const x = montar(t); aplicar({ texto: x, pos: x.length }); },
+        aoFim: () => {
+          setOuvindo(false); setPreparando(false); ditado.current = null;
+          if (!falado.trim() || enviandoRef.current) return;
+          // pontuação na hora (no aparelho) e, em seguida, a versão mais cuidadosa do servidor
+          const cru = montar(falado);
+          if (textoRef.current !== cru) return; // a pessoa mexeu no texto: não mexemos
+          const local = montar(pontuacaoLocal(falado));
+          aplicar({ texto: local, pos: local.length });
+          void api.pontuar(sessao.token, falado).then((r) => {
+            if (!r.ajustado || textoRef.current !== local || enviandoRef.current) return;
+            const x = montar(r.texto);
+            aplicar({ texto: x, pos: x.length });
+          }).catch(() => undefined);
+        },
         aoErro: (m) => setAviso(m),
       }, sessao.token);
     } catch (e) {
       setOuvindo(false);
+      setPreparando(false);
       setAviso(e instanceof Error ? e.message : "Não consegui usar o microfone.");
     }
   };
@@ -298,6 +319,12 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
       </div></div>
 
       {aviso && <p className="px-4 pb-1 text-xs text-aviso" role="status">{aviso}</p>}
+      {ouvindo && (
+        <div className="border-t border-borda bg-painel px-3 pt-2 text-xs text-suave" role="status" aria-live="polite">
+          {preparando ? "Preparando o microfone…" : "Fale agora. Toque no quadrado para pausar."}
+          {preparando && <div className="carregando-mic mt-1.5" />}
+        </div>
+      )}
       <form onSubmit={(e) => { e.preventDefault(); void mandar(); }} className="relative flex items-end gap-2 border-t border-borda bg-painel p-2.5">
         {corretorLigado && !proprio && tecladoFisico && <BarraSugestoes flutuante literal={literal} opcoes={opcoes} aoEscolher={escolherSugestao} />}
         <button type="button" onClick={() => void alternarMicrofone()} aria-label={ouvindo ? "Pausar o ditado" : "Ditar mensagem"} title={ouvindo ? "Toque para pausar. O texto fica no campo para você enviar." : "Ditado: fale e a fala vira texto"} className={`botao-redondo grid h-11 w-11 flex-none place-items-center border ${ouvindo ? "gravando border-magenta bg-magenta text-[#1a0620]" : "border-borda text-neon"}`}><Icone nome={ouvindo ? "parar" : "microfone"} tam={22} /></button>
@@ -308,7 +335,7 @@ export function ChatBase({ chave: apelido, titulo, subtitulo, avatar, aoVoltar, 
           onChange={(e) => { marcar(null); textoRef.current = e.target.value; setTexto(e.target.value); setCursor(e.target.selectionStart ?? e.target.value.length); }}
           onSelect={(e) => setCursor(e.currentTarget.selectionStart ?? 0)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && window.matchMedia("(min-width: 768px)").matches) { e.preventDefault(); void mandar(); return; } aoTeclar(e); }}
-          rows={1} maxLength={2000} placeholder={ouvindo ? "Ouvindo…" : "Mensagem"} lang="pt-BR" autoCapitalize="sentences" autoCorrect={proprio ? "off" : "on"} spellCheck={!proprio && !(corretorLigado && tecladoFisico)}
+          rows={1} maxLength={2000} placeholder={ouvindo ? (preparando ? "Preparando…" : "Fale agora…") : "Mensagem"} lang="pt-BR" autoCapitalize="sentences" autoCorrect={proprio ? "off" : "on"} spellCheck={!proprio && !(corretorLigado && tecladoFisico)}
           style={{ maxHeight: ALTURA_MAX_CAMPO }} className={`balao min-h-11 min-w-0 flex-1 resize-none [overflow-wrap:anywhere] border border-borda bg-fundo px-4 py-2.5 leading-6 outline-none focus:border-neon ${CAMPO_AUTOMATICO ? "field-sizing-content overflow-y-auto" : "overflow-hidden"}`} />
         <button disabled={!texto.trim()} className="botao-redondo grid h-11 w-11 flex-none place-items-center bg-neon text-lg font-bold text-white disabled:opacity-40" aria-label="Enviar"><Icone nome="enviar" tam={22} /></button>
       </form>

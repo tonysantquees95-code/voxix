@@ -103,3 +103,8 @@ button { cursor: pointer; }
 .barra-sug-flutuante { position: absolute; left: .625rem; right: .625rem; bottom: 100%; z-index: 5; height: 38px; padding: 0 0 5px; background: transparent; border-top: 0; }
 .barra-sug-flutuante { justify-content: flex-start; }
 .barra-sug-flutuante .sug { flex: 0 1 auto; min-width: 7rem; background: var(--color-painel); }
+
+/* barrinha de carregando enquanto o microfone prepara */
+.carregando-mic { height: 3px; border-radius: 99px; overflow: hidden; background: color-mix(in srgb, var(--color-neon) 18%, transparent); position: relative; }
+.carregando-mic::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; border-radius: 99px; background: linear-gradient(90deg, var(--color-neon), var(--color-magenta)); animation: carrega-mic 1s ease-in-out infinite; }
+@keyframes carrega-mic { from { transform: translateX(-100%); } to { transform: translateX(250%); } }

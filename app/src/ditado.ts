@@ -11,7 +11,7 @@ let nativoPronto = false;
 export function aquecerDitado(): void {
   if (Capacitor.isNativePlatform()) void import("@capacitor-community/speech-recognition").catch(() => undefined);
 }
-export interface Ganchos { aoTexto: (texto: string) => void; aoFim: () => void; aoErro: (mensagem: string) => void }
+export interface Ganchos { aoTexto: (texto: string) => void; aoFim: () => void; aoErro: (mensagem: string) => void; aoPronto?: () => void }
 
 export const LIMITE_GRAVACAO_MS = 30_000;
 
@@ -37,7 +37,7 @@ export async function iniciarDitado(g: Ganchos, token: string): Promise<Ditado> 
 
 interface ReconhecedorWeb {
   lang: string; continuous: boolean; interimResults: boolean;
-  start: () => void; stop: () => void; abort: () => void;
+  start: () => void; stop: () => void; abort: () => void; onaudiostart: (() => void) | null;
   onresult: ((e: { resultIndex: number; results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }> }) => void) | null;
   onerror: ((e: { error: string }) => void) | null;
   onend: (() => void) | null;
@@ -79,6 +79,7 @@ async function ditadoDoNavegador(g: Ganchos, reserva: () => Promise<Ditado>): Pr
     terminou = true;
     g.aoFim();
   };
+  r.onaudiostart = () => g.aoPronto?.();
   try { r.start(); } catch { return reserva(); }
   return { parar: async () => { pediuParar = true; if (trocou) { await trocou.parar(); return; } try { r.stop(); } catch { /* já parou */ } } };
 }
@@ -117,6 +118,7 @@ async function ditadoNativo(g: Ganchos): Promise<Ditado> {
     comecar().catch(() => finalizar());
   }));
   await comecar();
+  g.aoPronto?.();
   return { parar: async () => { pediuParar = true; try { await SpeechRecognition.stop(); } catch { /* já parou */ } finalizar(); } };
 }
 
@@ -148,5 +150,6 @@ async function ditadoPeloServidor(g: Ganchos, token: string): Promise<Ditado> {
     })();
   };
   gravador.start();
+  g.aoPronto?.();
   return { parar: async () => { if (gravador.state !== "inactive") gravador.stop(); } };
 }

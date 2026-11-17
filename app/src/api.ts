@@ -61,6 +61,7 @@ export const api = {
   enviar: (t: string, para: string, corpo: string, idLocal: string) => chamar<{ ok: boolean; id: string; criado: number }>("POST", "/voxix/mensagens", { para, corpo, idLocal }, t),
   historico: (t: string, desde: number, limite = 300) => chamar<{ mensagens: ItemDoHistorico[]; mais: boolean }>("GET", `/voxix/historico?desde=${desde}&limite=${limite}`, undefined, t, 30000),
   limparConversa: (t: string, apelido: string) => chamar("DELETE", `/voxix/conversas/${encodeURIComponent(apelido)}`, undefined, t),
+  pontuar: (t: string, texto: string) => chamar<{ texto: string; ajustado: boolean }>("POST", "/voxix/pontuar", { texto }, t),
   definirAvatar: (t: string, avatar: string | null) => chamar<{ avatar: string | null }>("PUT", "/voxix/perfil/avatar", { avatar }, t),
   avatares: (t: string, apelidos: string[]) => chamar<{ avatares: Record<string, string | null> }>("GET", `/voxix/avatares?apelidos=${encodeURIComponent(apelidos.join(","))}`, undefined, t),
   bloqueios: (t: string) => chamar<{ bloqueios: Pessoa[] }>("GET", "/voxix/bloqueios", undefined, t),

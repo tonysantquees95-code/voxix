@@ -27,8 +27,9 @@ test("comecaFrase: início, depois de ponto e depois de nova linha", () => {
 });
 
 test("teclas: letras do português e acentos", () => {
-  assert.equal(LETRAS.flat().length, 27);
-  assert.ok(LETRAS.flat().includes("ç"));
+  assert.equal(LETRAS.flat().length, 26); // sem tecla de ç: sai segurando o C
+  assert.ok(!LETRAS.flat().includes("ç"));
+  assert.ok(ACENTOS.c.includes("ç"));
   assert.equal(NUMEROS[0].join(""), "1234567890");
   for (const [k, v] of Object.entries(ACENTOS)) assert.ok(v.length > 0 && k.length === 1);
 });

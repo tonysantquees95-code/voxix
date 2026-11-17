@@ -1,7 +1,8 @@
 // Teclas e edição do teclado do Voxix (puro, sem React).
+// Sem tecla de ç, como no teclado do Android: o ç sai segurando o C (assim ninguém toca nele sem querer na ponta da fileira).
 export const LETRAS: string[][] = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-  ["a", "s", "d", "f", "g", "h", "j", "k", "l", "ç"],
+  ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
   ["z", "x", "c", "v", "b", "n", "m"],
 ];
 export const NUMEROS: string[][] = [

@@ -13,3 +13,7 @@
 
 ## Servidor
 - O servidor do Voxix mora no repositório `vetorial-srrvidor` (`servidor/src/voxix/`), no mesmo Worker. Mudou rota ou regra lá, confira aqui.
+
+## Teste visual das telas
+- `app/teste-visual/telas.mjs` (`npm run build && npm run test:visual`) abre o app em 7 tamanhos (celular pequeno até janela do Windows) e confere cada janela: cabe na tela, não estoura para o lado e todo botão dá para alcançar. Roda na publicação e guarda as fotos como artefato `fotos-das-telas`.
+- Tela ou janela nova: acrescente um cenário em `CENARIOS` nesse arquivo.

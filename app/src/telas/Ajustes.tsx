@@ -54,7 +54,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   return (
     <div className="fixed inset-0 z-10 grid place-items-center bg-black/70 p-4" onClick={fechar}>
       <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-[calc(100vh-2rem)] w-full max-w-sm space-y-4 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
-        <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">Ajustes</h2><button onClick={fechar} aria-label="Fechar" className="text-xl text-suave"><Icone nome="fechar" tam={22} /></button></div>
+        <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">Ajustes</h2><button onClick={fechar} aria-label="Fechar" className="grid min-h-10 min-w-10 place-items-center text-xl text-suave"><Icone nome="fechar" tam={22} /></button></div>
         <EscolherAvatar />
         <section><h3 className="text-sm font-bold text-suave">Conta</h3><p className="mt-1">@{perfil?.apelido} · {perfil?.nome}</p><p className="text-xs text-suave">{sessao?.email}</p></section>
         <section>

@@ -361,7 +361,7 @@ export function Personalizar({ fechar, irParaInicio }: { fechar: () => void; irP
                 <button onClick={() => { restaurarVisual(); guardarFoto("inicio", null); guardarFoto("conversa", null); setConfirmar(false); }} className="rounded-xl bg-erro px-3 py-1.5 font-bold text-[#2a0606]">Voltar</button>
                 <button onClick={() => setConfirmar(false)} className="rounded-xl border border-borda px-3 py-1.5">Não</button>
               </div>
-            ) : <button onClick={() => setConfirmar(true)} className="text-sm text-suave underline">Restaurar o padrão</button>}
+            ) : <button onClick={() => setConfirmar(true)} className="min-h-10 px-2 text-sm text-suave underline">Restaurar o padrão</button>}
           </div>
         </div>
       </div>

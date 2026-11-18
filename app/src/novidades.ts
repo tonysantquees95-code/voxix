@@ -41,6 +41,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 34, data: "2026-11-17", tipo: "melhoria", titulo: "Ditado mais rápido e com pausa", texto: "Ao tocar no microfone, as palavras já vão aparecendo enquanto você fala, sem esperar. O botão vira um quadradinho: toque nele para pausar. O texto fica no campo, e você pode tocar no microfone de novo para continuar ou enviar a mensagem. Se você fizer uma pausa falando, ele continua ouvindo." },
   { id: 35, data: "2026-11-17", tipo: "melhoria", titulo: "Ditado com carregando e pontuação", texto: "Ao tocar no microfone, aparece uma barrinha de carregando e a mensagem Preparando o microfone. Quando estiver pronto, aparece Fale agora. Quando você pausa, o texto ganha maiúscula, vírgulas, pontos e interrogação nos lugares certos, como numa mensagem bem escrita." },
   { id: 36, data: "2026-11-18", tipo: "correcao", titulo: "Janelas que não rolavam no Windows", texto: "A tela \"O que há de novo\" e as outras janelas do app agora rolam quando o conteúdo é maior que a tela, e dá para chegar no botão de baixo sem esforço." },
+  { id: 37, data: "2026-11-18", tipo: "melhoria", titulo: "Botões mais fáceis de tocar", texto: "Os botões de fechar, pular e ver mais ficaram maiores, para acertar com o dedo sem errar." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

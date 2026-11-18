@@ -70,8 +70,18 @@ export const api = {
   denunciar: (t: string, apelido: string, motivo: string, trecho?: string) => chamar("POST", "/voxix/denuncias", { apelido, motivo, trecho }, t),
 };
 
-/** Endereço do chat ao vivo (o navegador não manda cabeçalhos no WebSocket, então o token vai na URL). */
-export const enderecoWs = (token: string): string => `${SERVIDOR.replace(/^http/, "ws")}/voxix/ws?token=${encodeURIComponent(token)}`;
+/** Endereço do WebSocket. Pede um código de uso único (vale 60 s) para o token de login não ir na URL; se o servidor for antigo, usa o token. */
+async function enderecoSeguro(token: string, caminho: string): Promise<string> {
+  const base = `${SERVIDOR.replace(/^http/, "ws")}${caminho}`;
+  try {
+    const r = await chamar<{ ticket?: string }>("POST", "/voxix/ticket", {}, token, 8000);
+    if (r.ticket) return `${base}?ticket=${encodeURIComponent(r.ticket)}`;
+  } catch { /* servidor sem código de uso único ou sem rede: segue com o jeito antigo */ }
+  return `${base}?token=${encodeURIComponent(token)}`;
+}
+
+/** Endereço do chat ao vivo. */
+export const enderecoWs = (token: string): Promise<string> => enderecoSeguro(token, "/voxix/ws");
 
 /** Endereço da sala ao vivo. */
-export const enderecoDaSala = (token: string, sala: string): string => `${SERVIDOR.replace(/^http/, "ws")}/voxix/salas/${sala}/ws?token=${encodeURIComponent(token)}`;
+export const enderecoDaSala = (token: string, sala: string): Promise<string> => enderecoSeguro(token, `/voxix/salas/${sala}/ws`);

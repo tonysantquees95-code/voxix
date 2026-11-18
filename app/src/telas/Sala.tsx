@@ -38,10 +38,12 @@ export function Sala({ comunidade, icone, sala, menu, aoVoltar, aoPerder }: { co
     let batida: ReturnType<typeof setInterval> | undefined;
     const virar = (m: DoServidor): MsgChat => ({ id: m.id, minha: m.de === eu, corpo: m.corpo, criado: m.criado, estado: "enviada", autor: m.de });
     const juntar = (a: MsgChat[], novas: MsgChat[]) => { const ids = new Set(a.map((m) => m.id)); return [...a, ...novas.filter((m) => !ids.has(m.id))].sort((x, y) => x.criado - y.criado); };
-    const conectar = () => {
+    const conectar = async () => {
       if (parar) return;
       setEstado("conectando");
-      const w = new WebSocket(enderecoDaSala(token, sala.id));
+      const url = await enderecoDaSala(token, sala.id);
+      if (parar) return;
+      const w = new WebSocket(url);
       ws.current = w;
       w.onopen = () => { tentativa = 0; setEstado("ao vivo"); clearInterval(batida); batida = setInterval(() => { if (w.readyState === WebSocket.OPEN) w.send(JSON.stringify({ t: "ping" })); }, 25000); };
       w.onmessage = (e) => {
@@ -62,11 +64,11 @@ export function Sala({ comunidade, icone, sala, menu, aoVoltar, aoPerder }: { co
         setMensagens((a) => a.map((m) => (m.estado === "enviando" ? { ...m, estado: "falhou" } : m)));
         tentativa++;
         if (tentativa === 3) perder.current(); // confere se ainda faz parte (a tela pai verifica e, se sim, segue tentando)
-        religar = setTimeout(conectar, Math.min(15000, 1000 * 2 ** Math.min(tentativa, 4)));
+        religar = setTimeout(() => void conectar(), Math.min(15000, 1000 * 2 ** Math.min(tentativa, 4)));
       };
       w.onerror = () => { try { w.close(); } catch { /* ok */ } };
     };
-    conectar();
+    void conectar();
     return () => { parar = true; clearTimeout(religar); clearInterval(batida); try { ws.current?.close(); } catch { /* ok */ } ws.current = null; };
   }, [token, sala.id, eu]);
 

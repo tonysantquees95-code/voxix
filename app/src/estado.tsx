@@ -110,10 +110,12 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
         if (!r.mais) break;
       }
     };
-    const conectar = () => {
+    const conectar = async () => {
       if (parar) return;
       setConexao("conectando");
-      ws = new WebSocket(enderecoWs(sessao.token));
+      const url = await enderecoWs(sessao.token);
+      if (parar) return;
+      ws = new WebSocket(url);
       ws.onopen = () => { tentativa = 0; setConexao("conectado"); void sincronizarHistorico().catch((er) => { if (sessaoMorta(er)) sairLocal(); }); clearInterval(batida); batida = setInterval(() => { if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ t: "ping" })); }, 25000); };
       ws.onmessage = (e) => {
         try {
@@ -128,13 +130,13 @@ export function ProvedorDoVoxix({ children }: { children: ReactNode }) {
         setConexao("offline");
         tentativa++;
         if (tentativa % 3 === 0) api.perfil(sessao.token).catch((er) => { if (sessaoMorta(er)) sairLocal(); });
-        religar = setTimeout(conectar, Math.min(15000, 1000 * 2 ** Math.min(tentativa, 4)));
+        religar = setTimeout(() => void conectar(), Math.min(15000, 1000 * 2 ** Math.min(tentativa, 4)));
       };
       ws.onerror = () => { try { ws?.close(); } catch { /* ok */ } };
     };
-    const voltou = () => { if (document.visibilityState === "visible" && (!ws || ws.readyState === WebSocket.CLOSED)) { clearTimeout(religar); conectar(); } };
+    const voltou = () => { if (document.visibilityState === "visible" && (!ws || ws.readyState === WebSocket.CLOSED)) { clearTimeout(religar); void conectar(); } };
     document.addEventListener("visibilitychange", voltou);
-    conectar();
+    void conectar();
     return () => { parar = true; clearTimeout(religar); clearInterval(batida); document.removeEventListener("visibilitychange", voltou); try { ws?.close(); } catch { /* ok */ } setConexao("offline"); };
   }, [sessao, perfil, atualizar, sairLocal]);
 

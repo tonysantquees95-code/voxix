@@ -26,7 +26,7 @@ export function PapelDaConversa({ chave, nome, fechar }: { chave: string; nome: 
 
   return (
     <div className="fixed inset-0 z-20 grid place-items-center bg-black/70 p-4" onClick={fechar}>
-      <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-full w-full max-w-sm space-y-3 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
+      <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-[calc(100vh-2rem)] w-full max-w-sm space-y-3 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
         <h2 className="text-lg font-extrabold">Papel de parede</h2>
         <p className="text-sm text-suave">Só para a conversa com {nome}. Cada conversa pode ter o seu.</p>
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Modelo do fundo">

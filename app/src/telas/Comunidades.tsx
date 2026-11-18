@@ -14,7 +14,7 @@ export function AvatarComunidade({ nome, tam = 44 }: { nome: string; tam?: numbe
 export function Janela({ titulo, fechar, children }: { titulo: string; fechar: () => void; children: ReactNode }) {
   return (
     <div className="fixed inset-0 z-10 grid place-items-center bg-black/70 p-4" onClick={fechar}>
-      <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-full w-full max-w-sm space-y-3 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
+      <div onClick={(e) => e.stopPropagation()} className="rolagem max-h-[calc(100vh-2rem)] w-full max-w-sm space-y-3 overflow-y-auto rounded-2xl border border-borda bg-painel p-5">
         <div className="flex items-center justify-between"><h2 className="text-lg font-extrabold">{titulo}</h2><button onClick={fechar} aria-label="Fechar" className="text-suave"><Icone nome="fechar" tam={22} /></button></div>
         {children}
       </div>

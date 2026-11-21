@@ -22,6 +22,7 @@ export default {
     ["tela-inicial", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").waitFor(); }],
     ["ajustes", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByRole("heading", { name: "Ajustes" }).waitFor(); }],
     ["ajustes-novidades", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByRole("button", { name: "O que há de novo" }).click(); await p.getByRole("button", { name: "Entendi" }).waitFor(); }],
+    ["ajustes-feedback", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByRole("button", { name: "Enviar feedback" }).click(); await p.getByText(/^FEEDBACK/).waitFor(); await p.waitForTimeout(300); }],
     ["ajustes-termos", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByRole("button", { name: "Termos de uso" }).click(); await p.waitForTimeout(300); }],
     ["ajustes-tour", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByRole("button", { name: "Como o Voxix funciona" }).click(); await p.waitForTimeout(300); }],
     ["personalizar", "normal", async (p) => { await p.getByLabel("Abrir meus ajustes").click(); await p.getByText("Cores, formato, fundo e teclado").click(); await p.waitForTimeout(400); }],

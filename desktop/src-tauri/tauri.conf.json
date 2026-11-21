@@ -21,7 +21,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://venus-servidor.tonysantquees95.workers.dev wss://venus-servidor.tonysantquees95.workers.dev ipc: http://ipc.localhost; img-src 'self' data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self'; frame-src https://venus-servidor.tonysantquees95.workers.dev; connect-src 'self' https://venus-servidor.tonysantquees95.workers.dev wss://venus-servidor.tonysantquees95.workers.dev ipc: http://ipc.localhost; img-src 'self' data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {

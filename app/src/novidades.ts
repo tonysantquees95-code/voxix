@@ -42,6 +42,7 @@ export const NOVIDADES: Novidade[] = [
   { id: 35, data: "2026-11-17", tipo: "melhoria", titulo: "Ditado com carregando e pontuação", texto: "Ao tocar no microfone, aparece uma barrinha de carregando e a mensagem Preparando o microfone. Quando estiver pronto, aparece Fale agora. Quando você pausa, o texto ganha maiúscula, vírgulas, pontos e interrogação nos lugares certos, como numa mensagem bem escrita." },
   { id: 36, data: "2026-11-18", tipo: "correcao", titulo: "Janelas que não rolavam no Windows", texto: "A tela \"O que há de novo\" e as outras janelas do app agora rolam quando o conteúdo é maior que a tela, e dá para chegar no botão de baixo sem esforço." },
   { id: 37, data: "2026-11-18", tipo: "melhoria", titulo: "Botões mais fáceis de tocar", texto: "Os botões de fechar, pular e ver mais ficaram maiores, para acertar com o dedo sem errar." },
+  { id: 38, data: "2026-11-21", tipo: "novo", titulo: "Feedback e relato de erros", texto: "Em Ajustes › Sobre o Voxix você encontra Enviar feedback e Reportar um erro: conte o que achou, avise quando algo não funcionou e responda uma pesquisa rápida de 1 minuto. O Voxix está em fase de testes (beta) e cada relato ajuda a melhorar." },
 ];
 
 export const ROTULO: Record<TipoNovidade, string> = { novo: "Novo", melhoria: "Melhorou", correcao: "Corrigido" };

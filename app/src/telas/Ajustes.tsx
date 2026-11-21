@@ -10,6 +10,7 @@ import { Icone } from "../icones";
 import { Personalizar } from "./Personalizar";
 import { NOVIDADES } from "../novidades";
 import { Novidades } from "./Novidades";
+import { FeedbackDoApp } from "./FeedbackDoApp";
 import { Termos, Tour } from "./Apresentacao";
 import { EscolherAvatar } from "./EscolherAvatar";
 
@@ -18,7 +19,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
   const [bloqueados, setBloqueados] = useState<Pessoa[] | null>(null);
   const [versao, setVersao] = useState("");
   const [novaVersao, setNovaVersao] = useState(false);
-  const [ver, setVer] = useState<"tour" | "termos" | "novidades" | null>(null);
+  const [ver, setVer] = useState<"tour" | "termos" | "novidades" | "feedback" | null>(null);
   const [personalizando, setPersonalizando] = useState(false);
   const [avisos, setAvisos] = useState(avisosLigados());
   const [permissao, setPermissao] = useState<PermissaoAvisos>("default");
@@ -103,6 +104,8 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
           <div className="mt-2 flex flex-col gap-2 text-sm">
             <button onClick={() => setVer("tour")} className="rounded-xl border border-borda px-4 py-2 text-left">Como o Voxix funciona</button>
             <button onClick={() => setVer("novidades")} className="rounded-xl border border-borda px-4 py-2 text-left">O que há de novo</button>
+            <button onClick={() => setVer("feedback")} className="rounded-xl border border-borda px-4 py-2 text-left">Enviar feedback</button>
+            <button onClick={() => setVer("feedback")} className="rounded-xl border border-borda px-4 py-2 text-left">Reportar um erro</button>
             <button onClick={() => setVer("termos")} className="rounded-xl border border-borda px-4 py-2 text-left">Termos de uso</button>
           </div>
         </section>
@@ -112,6 +115,7 @@ export function Ajustes({ fechar }: { fechar: () => void }) {
       {personalizando && <Personalizar fechar={() => setPersonalizando(false)} irParaInicio={fechar} />}
       {ver === "tour" && <div className="fixed inset-0 z-50 flex flex-col bg-fundo p-5" onClick={(e) => e.stopPropagation()}><div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col"><Tour rotuloFinal="Fechar" aoTerminar={() => setVer(null)} aoFechar={() => setVer(null)} /></div></div>}
       {ver === "termos" && <Termos aoFechar={() => setVer(null)} />}
+      {ver === "feedback" && <FeedbackDoApp aoFechar={() => setVer(null)} />}
       {ver === "novidades" && <Novidades itens={[...NOVIDADES].sort((a, b) => b.id - a.id)} aoFechar={() => setVer(null)} />}
     </div>
   );

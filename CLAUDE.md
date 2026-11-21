@@ -17,3 +17,6 @@
 ## Teste visual das telas
 - `app/teste-visual/telas.mjs` (`npm run build && npm run test:visual`) abre o app em 7 tamanhos (celular pequeno até janela do Windows) e confere cada janela: cabe na tela, não estoura para o lado e todo botão dá para alcançar. Roda na publicação e guarda as fotos como artefato `fotos-das-telas`.
 - Tela ou janela nova: acrescente um cenário em `CENARIOS` nesse arquivo.
+
+## Feedback e relato de erro
+- Ajustes › Sobre tem "Enviar feedback" e "Reportar um erro": abrem `telas/FeedbackDoApp.tsx` (página do servidor `/feedback?app=voxix&v=<versão>&p=<plataforma>` num iframe, com o visual do app). Os relatos chegam no Painel Dev › Feedback. Windows: o CSP do `tauri.conf.json` precisa de `frame-src` do servidor. Cenário `feedback` no teste visual.
